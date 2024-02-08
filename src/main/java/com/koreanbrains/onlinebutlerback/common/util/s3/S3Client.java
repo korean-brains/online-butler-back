@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -21,16 +19,16 @@ public class S3Client {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public UploadFile upload(MultipartFile file) {
+    public UploadFile upload(MultipartFile file, String storeName) {
         String originalFilename = file.getOriginalFilename();
-        String storeFilename = createStoreFileName(originalFilename);
+        String storeFilename = createStoreFileName(originalFilename, storeName);
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());
 
         try {
             client.putObject(new PutObjectRequest(bucket, storeFilename, file.getInputStream(), metadata));
-        } catch (IOException exception) {
+        } catch (Exception exception) {
             throw new com.koreanbrains.onlinebutlerback.common.exception.IOException(exception, ErrorCode.FILE_NOT_UPLOADED);
         }
 
@@ -38,10 +36,9 @@ public class S3Client {
     }
 
 
-    private String createStoreFileName(String originalFilename) {
+    private String createStoreFileName(String originalFilename, String storeName) {
         String ext = extractExt(originalFilename);
-        String uuid = UUID.randomUUID().toString();
-        return uuid + "." + ext;
+        return storeName + "." + ext;
     }
 
     private String extractExt(String originalFilename) {

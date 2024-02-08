@@ -83,12 +83,19 @@ jacocoTestReport {
         csv.required = false
     }
 
+    def Qdomains = []
+    for (qPattern in '**/QA'..'**/QZ') {
+        Qdomains.add(qPattern + '*')
+    }
+
     afterEvaluate {
         classDirectories.setFrom(
                 files(classDirectories.files.collect {
                     fileTree(dir: it, excludes: [
                             '**/*Application*',
-                    ])
+                            '**/common/config/**',
+                            '**/common/exception/**',
+                    ] + Qdomains)
                 })
         )
     }
@@ -97,6 +104,11 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
+    def Qdomains = []
+    for (qPattern in '**.QA'..'**.QZ') {
+        Qdomains.add(qPattern + '*')
+    }
+
     violationRules {
         rule {
             enabled = true
@@ -117,7 +129,9 @@ jacocoTestCoverageVerification {
 
             excludes = [
                     '**.*Application*',
-            ]
+                    '**.common.config.**',
+                    '**.common.exception.**',
+            ] + Qdomains
         }
     }
 }

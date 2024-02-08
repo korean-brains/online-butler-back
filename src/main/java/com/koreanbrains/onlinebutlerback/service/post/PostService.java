@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,10 +28,10 @@ public class PostService {
                 .caption(caption)
                 .build();
 
-        postRepository.save(post);
+        Long postId = postRepository.save(post).getId();
 
         for (MultipartFile image : images) {
-            UploadFile uploadFile = s3Client.upload(image);
+            UploadFile uploadFile = s3Client.upload(image, UUID.randomUUID().toString());
 
             PostImage postImage = PostImage.builder()
                     .post(post)
@@ -41,7 +43,7 @@ public class PostService {
             postImageRepository.save(postImage);
         }
 
-        return post.getId();
+        return postId;
     }
 
 
