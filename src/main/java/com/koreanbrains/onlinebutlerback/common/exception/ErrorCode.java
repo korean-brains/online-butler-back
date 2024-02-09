@@ -7,6 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
     FILE_NOT_UPLOADED(500, "S3_001", "파일을 업로드하지 못했습니다."),
+
+    POST_NOT_FOUND(404, "P_001", "포스트를 찾을 수 없습니다."),
     
     
     ;
