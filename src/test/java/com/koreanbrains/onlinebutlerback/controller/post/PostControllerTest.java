@@ -105,4 +105,20 @@ class PostControllerTest {
         result.andExpect(status().isNotFound());
     }
 
+    @Test
+    @DisplayName("포스트 내용을 수정한다")
+    void updatePost() throws Exception {
+        // given
+        doNothing().when(postService).updatePost(anyLong(), anyString(), anyLong());
+        PostUpdateRequest request = new PostUpdateRequest("수정된 포스트 내용");
+
+        // when
+        ResultActions result = mockMvc.perform(patch("/post/{postId}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(request)));
+
+        // then
+        result.andExpect(status().isNoContent());
+    }
+
 }

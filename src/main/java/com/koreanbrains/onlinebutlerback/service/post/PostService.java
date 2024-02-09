@@ -1,5 +1,8 @@
 package com.koreanbrains.onlinebutlerback.service.post;
 
+import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
+import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
+import com.koreanbrains.onlinebutlerback.common.exception.PermissionDeniedException;
 import com.koreanbrains.onlinebutlerback.common.util.s3.S3Client;
 import com.koreanbrains.onlinebutlerback.common.util.s3.UploadFile;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -44,6 +48,18 @@ public class PostService {
         }
 
         return postId;
+    }
+
+    @Transactional
+    public void updatePost(Long postId, String caption, Long memberId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.POST_NOT_FOUND));
+
+        if (!Objects.equals(post.getMemberId(), memberId)) {
+            throw new PermissionDeniedException(ErrorCode.PERMISSION_DENIED);
+        }
+
+        post.changeCaption(caption);
     }
 
 

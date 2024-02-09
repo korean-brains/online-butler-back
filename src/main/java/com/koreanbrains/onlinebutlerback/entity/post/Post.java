@@ -19,4 +19,8 @@ public class Post extends BaseTimeEntity {
     @CreatedBy
     @Column(nullable = false, updatable = false)
     private Long memberId;
+
+    public void changeCaption(String caption) {
+        this.caption = caption;
+    }
 }

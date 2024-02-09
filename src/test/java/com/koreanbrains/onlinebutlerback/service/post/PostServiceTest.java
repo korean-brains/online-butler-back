@@ -1,6 +1,9 @@
 package com.koreanbrains.onlinebutlerback.service.post;
 
+import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.exception.IOException;
+import com.koreanbrains.onlinebutlerback.common.exception.PermissionDeniedException;
+import com.koreanbrains.onlinebutlerback.common.fixtures.PostFixture;
 import com.koreanbrains.onlinebutlerback.common.util.s3.S3Client;
 import com.koreanbrains.onlinebutlerback.common.util.s3.UploadFile;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
@@ -15,6 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -77,5 +82,44 @@ class PostServiceTest {
         // then
         assertThatThrownBy(() -> postService.createPost(caption, images))
                 .isInstanceOf(IOException.class);
+    }
+
+    @Test
+    @DisplayName("포스트 내용을 수정한다")
+    void updatePost() {
+        // given
+        Post post = PostFixture.post(1L, 1L);
+        given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+
+        // when
+        postService.updatePost(1L, "수정된 포스트 내용", 1L);
+
+        // then
+        assertThat(post.getCaption()).isEqualTo("수정된 포스트 내용");
+    }
+
+    @Test
+    @DisplayName("수정하려는 포스트가 존재하지 않으면 예외가 발생한다")
+    void failUpdatePost() {
+        // given
+        given(postRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        // when
+        // then
+        assertThatThrownBy(() -> postService.updatePost(1L, "수정된 포스트 내용", 1L))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("수정하려는 사람과 포스트의 작성자가 다르면 예외가 발생한다")
+    void failUpdatePostWriter() {
+        // given
+        Post post = PostFixture.post(1L, 1L);
+        given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+
+        // when
+        // then
+        assertThatThrownBy(() -> postService.updatePost(1L, "수정된 포스트 내용", 2L))
+                .isInstanceOf(PermissionDeniedException.class);
     }
 }

@@ -38,4 +38,13 @@ public class PostController {
         return new PostGetResponse(post, postImages);
     }
 
+    // TODO : Security 적용
+    @PatchMapping("/{postId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updatePost(@PathVariable("postId") Long postId,
+                           @RequestBody PostUpdateRequest request) {
+
+        postService.updatePost(postId, request.caption(), 1L);
+    }
+
 }
