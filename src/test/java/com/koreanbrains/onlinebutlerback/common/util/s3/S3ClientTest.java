@@ -68,4 +68,17 @@ class S3ClientTest {
                 .isInstanceOf(IOException.class);
     }
 
+    @Test
+    @DisplayName("업로드된 파일을 삭제한다")
+    void delete() {
+        // given
+        doNothing().when(amazonS3Client).deleteObject(any(), anyString());
+
+        // when
+        s3Client.delete("image.jpg");
+
+        // then
+        then(amazonS3Client).should().deleteObject(any(), eq("image.jpg"));
+    }
+
 }

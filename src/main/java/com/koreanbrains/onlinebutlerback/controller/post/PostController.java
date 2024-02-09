@@ -47,4 +47,10 @@ public class PostController {
         postService.updatePost(postId, request.caption(), 1L);
     }
 
+    // TODO : Security 적용
+    @DeleteMapping("/{postId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePost(@PathVariable("postId") Long postId) {
+        postService.deletePost(postId, 1L);
+    }
 }

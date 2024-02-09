@@ -35,6 +35,10 @@ public class S3Client {
         return new UploadFile(originalFilename, storeFilename, client.getUrl(bucket, storeFilename).toString());
     }
 
+    public void delete(String filename) {
+        client.deleteObject(bucket, filename);
+    }
+
 
     private String createStoreFileName(String originalFilename, String storeName) {
         String ext = extractExt(originalFilename);

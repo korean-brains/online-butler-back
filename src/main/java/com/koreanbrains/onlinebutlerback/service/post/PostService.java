@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -62,5 +63,19 @@ public class PostService {
         post.changeCaption(caption);
     }
 
+    @Transactional
+    public void deletePost(Long postId, Long memberId) {
+        postRepository.findById(postId).ifPresent(post -> {
+            if(!Objects.equals(post.getMemberId(), memberId))
+                throw new PermissionDeniedException(ErrorCode.PERMISSION_DENIED);
+
+            List<PostImage> postImages = postImageRepository.findByPostId(postId);
+            for (PostImage postImage : postImages) {
+                s3Client.delete(postImage.getStoredName());
+            }
+            postImageRepository.deleteAll(postImages);
+            postRepository.delete(post);
+        });
+    }
 
 }

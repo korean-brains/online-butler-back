@@ -121,4 +121,17 @@ class PostControllerTest {
         result.andExpect(status().isNoContent());
     }
 
+    @Test
+    @DisplayName("포스트를 삭제한다")
+    void deletePost() throws Exception {
+        // given
+        doNothing().when(postService).deletePost(anyLong(), anyLong());
+
+        // when
+        ResultActions result = mockMvc.perform(delete("/post/{postId}", 1));
+
+        // then
+        result.andExpect(status().isNoContent());
+    }
+
 }
