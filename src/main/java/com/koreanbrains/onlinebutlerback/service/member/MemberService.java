@@ -23,10 +23,8 @@ public class MemberService {
         return memberRepository.save(member).getId();
     }
 
-    public MemberGetResponse getMember(Long memberId) {
-        Member findmember =  memberRepository.findById(memberId)
+    public Member getMember(Long memberId) {
+        return memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-        return new MemberGetResponse(findmember);
     }
 }

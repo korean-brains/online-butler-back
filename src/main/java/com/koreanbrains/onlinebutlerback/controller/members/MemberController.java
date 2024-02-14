@@ -1,5 +1,6 @@
 package com.koreanbrains.onlinebutlerback.controller.members;
 
+import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,8 @@ public class MemberController {
 
     @GetMapping("/{member-id}")
     public MemberGetResponse getMember(@PathVariable("member-id") Long memberId){
-        return memberService.getMember(memberId);
+        Member findMember = memberService.getMember(memberId);
+
+        return new MemberGetResponse(findMember);
     }
 }

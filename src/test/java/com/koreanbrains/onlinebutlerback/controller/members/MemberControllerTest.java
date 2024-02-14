@@ -59,7 +59,7 @@ class MemberControllerTest {
     void getMember() throws Exception {
         // given
         Member member = MemberFixture.member();
-        given(memberService.getMember(anyLong())).willReturn(new MemberGetResponse(member));
+        given(memberService.getMember(anyLong())).willReturn(member);
 
         // when
         ResultActions result = mockMvc.perform(get("/member/{memberId}", 1));

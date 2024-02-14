@@ -51,12 +51,12 @@ public class MemberServiceTest {
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
 
         // when
-        MemberGetResponse response = memberService.getMember(1L);
+        Member findMember = memberService.getMember(1L);
 
         // then
-        assertThat(response.id()).isEqualTo(member.getId());
-        assertThat(response.name()).isEqualTo(member.getName());
-        assertThat(response.email()).isEqualTo(member.getEmail());
+        assertThat(findMember.getId()).isEqualTo(member.getId());
+        assertThat(findMember.getName()).isEqualTo(member.getName());
+        assertThat(findMember.getEmail()).isEqualTo(member.getEmail());
     }
 
     @Test
