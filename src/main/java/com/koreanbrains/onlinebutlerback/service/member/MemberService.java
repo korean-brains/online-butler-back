@@ -8,11 +8,15 @@ import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
+
     private final MemberRepository memberRepository;
+
+    @Transactional
     public Long createMember(MemberCreateRequest dto) {
         Member member = Member.builder()
                 .name(dto.name())
