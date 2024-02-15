@@ -26,7 +26,7 @@ public class PostController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Long createPost(@RequestPart("post") PostCreateRequest request, @RequestPart("images") MultipartFile[] images) {
-        return postService.createPost(request.caption(), images);
+        return postService.createPost(request.caption(), images, request.tags());
     }
 
     @GetMapping("/{postId}")
@@ -44,7 +44,7 @@ public class PostController {
     public void updatePost(@PathVariable("postId") Long postId,
                            @RequestBody PostUpdateRequest request) {
 
-        postService.updatePost(postId, request.caption(), 1L);
+        postService.updatePost(postId, request.caption(), request.tags(), 1L);
     }
 
     // TODO : Security 적용

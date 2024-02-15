@@ -45,8 +45,8 @@ class PostControllerTest {
     @DisplayName("포스트를 생성한다")
     void createPost() throws Exception {
         // given
-        given(postService.createPost(any(), any())).willReturn(1L);
-        PostCreateRequest request = new PostCreateRequest("포스트 내용");
+        given(postService.createPost(any(), any(), any())).willReturn(1L);
+        PostCreateRequest request = new PostCreateRequest("포스트 내용", new String[]{"뚱냥이", "고양이"});
         MockMultipartFile post = new MockMultipartFile("post",
                 "post.json",
                 MediaType.APPLICATION_JSON_VALUE,
@@ -109,8 +109,8 @@ class PostControllerTest {
     @DisplayName("포스트 내용을 수정한다")
     void updatePost() throws Exception {
         // given
-        doNothing().when(postService).updatePost(anyLong(), anyString(), anyLong());
-        PostUpdateRequest request = new PostUpdateRequest("수정된 포스트 내용");
+        doNothing().when(postService).updatePost(anyLong(), anyString(), any(), anyLong());
+        PostUpdateRequest request = new PostUpdateRequest("수정된 포스트 내용", new String[]{"뚱냥이", "고양이"});
 
         // when
         ResultActions result = mockMvc.perform(patch("/post/{postId}", 1)

@@ -11,6 +11,7 @@ import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
+import com.koreanbrains.onlinebutlerback.service.tag.TagService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +40,8 @@ class PostServiceTest {
     PostRepository postRepository;
     @Mock
     PostImageRepository postImageRepository;
+    @Mock
+    TagService tagService;
 
 
     @Test
@@ -55,12 +58,14 @@ class PostServiceTest {
                         "cat.jpg",
                         MediaType.IMAGE_PNG_VALUE,
                         "<<image>>".getBytes())};
+        String[] tags = {"고양이", "뚱냥이"};
 
         given(postRepository.save(any())).willReturn(Post.builder().id(1L).build());
         given(postImageRepository.save(any())).willReturn(PostImage.builder().build());
+        doNothing().when(tagService).linkTags(any(), any());
 
         // when
-        Long postId = postService.createPost(caption, images);
+        Long postId = postService.createPost(caption, images, tags);
 
         // then
         assertThat(postId).isEqualTo(1L);
@@ -79,10 +84,11 @@ class PostServiceTest {
                         "cat.jpg",
                         MediaType.IMAGE_PNG_VALUE,
                         "<<image>>".getBytes())};
+        String[] tags = {"고양이", "뚱냥이"};
         
         // when
         // then
-        assertThatThrownBy(() -> postService.createPost(caption, images))
+        assertThatThrownBy(() -> postService.createPost(caption, images, tags))
                 .isInstanceOf(IOException.class);
     }
 
@@ -94,7 +100,7 @@ class PostServiceTest {
         given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
 
         // when
-        postService.updatePost(1L, "수정된 포스트 내용", 1L);
+        postService.updatePost(1L, "수정된 포스트 내용", new String[]{"뚱냥이", "고양이"}, 1L);
 
         // then
         assertThat(post.getCaption()).isEqualTo("수정된 포스트 내용");
@@ -108,7 +114,7 @@ class PostServiceTest {
 
         // when
         // then
-        assertThatThrownBy(() -> postService.updatePost(1L, "수정된 포스트 내용", 1L))
+        assertThatThrownBy(() -> postService.updatePost(1L, "수정된 포스트 내용", new String[]{"뚱냥이", "고양이"}, 1L))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
@@ -121,7 +127,7 @@ class PostServiceTest {
 
         // when
         // then
-        assertThatThrownBy(() -> postService.updatePost(1L, "수정된 포스트 내용", 2L))
+        assertThatThrownBy(() -> postService.updatePost(1L, "수정된 포스트 내용", new String[]{"뚱냥이", "고양이"}, 2L))
                 .isInstanceOf(PermissionDeniedException.class);
     }
 
