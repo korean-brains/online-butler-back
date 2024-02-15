@@ -1,5 +1,6 @@
 package com.koreanbrains.onlinebutlerback.entity.member;
 
+import com.koreanbrains.onlinebutlerback.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +15,7 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "members")
-public class Member {
+public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
