@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
     //400
+    NO_AUTHORITIES_KEY(400, "JWT_001", "권한 정보가 없습니다."),
 
     //403
     PERMISSION_DENIED(403, "PM_001", "권한이 없습니다."),
