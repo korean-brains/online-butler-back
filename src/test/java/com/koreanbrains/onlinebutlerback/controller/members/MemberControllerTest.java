@@ -39,7 +39,7 @@ class MemberControllerTest {
     @DisplayName("멤버를 생성한다")
     void createMember() throws Exception {
         // given
-        given(memberService.createMember(any())).willReturn(1L);
+        given(memberService.createMember(anyString(), anyString(), anyString())).willReturn(1L);
         MemberCreateRequest request = new MemberCreateRequest("kim", "kin@gmail.com", "password");
 
         // when

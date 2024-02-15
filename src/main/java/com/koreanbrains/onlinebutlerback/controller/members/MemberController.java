@@ -17,7 +17,7 @@ public class MemberController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Long createMember(@RequestBody MemberCreateRequest dto){
-        return memberService.createMember(dto);
+        return memberService.createMember(dto.name(), dto.email(), dto.password());
     }
 
     @GetMapping("/{member-id}")

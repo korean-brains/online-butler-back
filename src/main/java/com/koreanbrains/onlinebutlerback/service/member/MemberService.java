@@ -16,11 +16,11 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long createMember(MemberCreateRequest dto) {
+    public Long createMember(String name, String email, String password) {
         Member member = Member.builder()
-                .name(dto.name())
-                .email(dto.email())
-                .password(dto.password())
+                .name(name)
+                .email(email)
+                .password(password)
                 .build();
 
         return memberRepository.save(member).getId();

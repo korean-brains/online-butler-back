@@ -37,7 +37,7 @@ public class MemberServiceTest {
         given(memberRepository.save(any())).willReturn(Member.builder().id(1L).build());
 
         // when
-        Long memberId = memberService.createMember(request);
+        Long memberId = memberService.createMember(request.name(), request.email(), request.password());
 
         // then
         assertThat(memberId).isEqualTo(1L);
