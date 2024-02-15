@@ -1,4 +1,4 @@
 package com.koreanbrains.onlinebutlerback.controller.members;
 
-public record MemberPatchRequest(String name) {
+public record MemberUpdateRequest(String name) {
 }

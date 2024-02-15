@@ -17,11 +17,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = MemberController.class,
@@ -82,5 +80,36 @@ class MemberControllerTest {
 
         // then
         result.andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("멤버 이름을 수정한다.")
+    void updateMember() throws Exception {
+        // given
+        given(memberService.updateMember(anyLong(), anyString())).willReturn(1L);
+        MemberUpdateRequest request = new MemberUpdateRequest("lee");
+
+        // when
+        ResultActions result = mockMvc.perform(patch("/member/{memberId}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(request)));
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(content().string("1"));
+    }
+
+    @Test
+    @DisplayName("멤버를 비활성화 한다.")
+    void disableMember() throws Exception {
+        // given
+        given(memberService.disableMember(anyLong())).willReturn(1L);
+
+        // when
+        ResultActions result = mockMvc.perform(delete("/member/{memberId}", 1));
+
+        // then
+        result.andExpect(status().isNoContent())
+                .andExpect(content().string("1"));
     }
 }

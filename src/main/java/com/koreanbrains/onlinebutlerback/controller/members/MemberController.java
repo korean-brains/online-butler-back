@@ -28,8 +28,9 @@ public class MemberController {
     }
 
     @PatchMapping("/{member-id}")
+    @ResponseStatus(HttpStatus.OK)
     public Long updateMember(@PathVariable("member-id") Long memberId,
-                             @RequestBody MemberPatchRequest dto){
+                             @RequestBody MemberUpdateRequest dto){
         return memberService.updateMember(memberId, dto.name());
     }
 

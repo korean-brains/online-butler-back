@@ -71,4 +71,58 @@ public class MemberServiceTest {
         assertThatThrownBy(() -> memberService.getMember(1L))
                 .isInstanceOf(EntityNotFoundException.class);
     }
+
+    @Test
+    @DisplayName("멤버 이름을 수정한다")
+    void updateMember() {
+        // given
+        Member member = MemberFixture.member();
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+
+        // when
+        memberService.updateMember(1L, "changedName");
+
+        // then
+        assertThat(member.getName()).isEqualTo("changedName");
+    }
+
+    @Test
+    @DisplayName("업데이트할 멤버가 없으면 404 예외가 발생한다")
+    void failUpdateMember() {
+        // given
+        given(memberRepository.findById(any())).willReturn(Optional.empty());
+
+        // when
+
+        // then
+        assertThatThrownBy(() -> memberService.updateMember(1L, "changedName"))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("멤버를 비활성화 한다")
+    void disableMember() {
+        // given
+        Member member = MemberFixture.member();
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+
+        // when
+        memberService.disableMember(1L);
+
+        // then
+        assertThat(member.isActive()).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("비활성화할 멤버가 없으면 404 예외가 발생한다")
+    void failDisableMember() {
+        // given
+        given(memberRepository.findById(any())).willReturn(Optional.empty());
+
+        // when
+
+        // then
+        assertThatThrownBy(() -> memberService.disableMember(1L))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
 }
