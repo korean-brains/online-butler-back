@@ -1,6 +1,7 @@
 package com.koreanbrains.onlinebutlerback.entity.member;
 
 import com.koreanbrains.onlinebutlerback.common.entity.BaseTimeEntity;
+import com.koreanbrains.onlinebutlerback.common.security.config.Authority;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,9 @@ public class Member extends BaseTimeEntity {
     private String name;
     private String email;
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Authority authority;
 
     @ColumnDefault("true")
     private boolean isActive;

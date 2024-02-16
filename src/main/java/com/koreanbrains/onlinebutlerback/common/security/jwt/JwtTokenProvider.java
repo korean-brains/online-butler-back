@@ -2,10 +2,7 @@ package com.koreanbrains.onlinebutlerback.common.security.jwt;
 
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.exception.PermissionDeniedException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +42,8 @@ public class JwtTokenProvider {
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
-
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
@@ -78,9 +75,20 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
-//    public boolean validateToken(){
-//
-//    }
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+            throw new PermissionDeniedException(ErrorCode.INVALID_SIGNATURE);
+        } catch (ExpiredJwtException e) {
+            throw new PermissionDeniedException(ErrorCode.EXPIRED_TOKEN);
+        } catch (UnsupportedJwtException e) {
+            throw new PermissionDeniedException(ErrorCode.UNSUPPORTED_TOKEN);
+        } catch (IllegalArgumentException e) {
+            throw new PermissionDeniedException(ErrorCode.INVALID_TOKEN);
+        }
+    }
 
     private Claims parseClaims(String accessToken) {
         try {

@@ -1,4 +1,4 @@
-package com.koreanbrains.onlinebutlerback.common.config;
+package com.koreanbrains.onlinebutlerback.common.security.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
