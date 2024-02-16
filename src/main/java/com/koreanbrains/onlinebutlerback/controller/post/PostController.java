@@ -4,8 +4,11 @@ import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundExceptio
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
+import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
+import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
+import com.koreanbrains.onlinebutlerback.repository.tag.TagMappingRepository;
 import com.koreanbrains.onlinebutlerback.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,7 @@ public class PostController {
     private final PostService postService;
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
+    private final TagMappingRepository tagMappingRepository;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -34,8 +38,11 @@ public class PostController {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.POST_NOT_FOUND));
         List<PostImage> postImages = postImageRepository.findByPostId(postId);
+        List<Tag> tags = tagMappingRepository.findAllByPost(post).stream()
+                .map(TagMapping::getTag)
+                .toList();
 
-        return new PostGetResponse(post, postImages);
+        return new PostGetResponse(post, postImages, tags);
     }
 
     // TODO : Security 적용

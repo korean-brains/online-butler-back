@@ -79,6 +79,7 @@ public class PostService {
                 s3Client.delete(postImage.getStoredName());
             }
             postImageRepository.deleteAll(postImages);
+            tagService.resetTags(post.getId());
             postRepository.delete(post);
         });
     }

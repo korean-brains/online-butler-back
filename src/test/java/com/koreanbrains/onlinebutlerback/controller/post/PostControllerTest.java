@@ -3,10 +3,15 @@ package com.koreanbrains.onlinebutlerback.controller.post;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koreanbrains.onlinebutlerback.common.fixtures.PostFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.PostImageFixture;
+import com.koreanbrains.onlinebutlerback.common.fixtures.TagFixture;
+import com.koreanbrains.onlinebutlerback.common.fixtures.TagMappingFixture;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
+import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
+import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
+import com.koreanbrains.onlinebutlerback.repository.tag.TagMappingRepository;
 import com.koreanbrains.onlinebutlerback.service.post.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +42,8 @@ class PostControllerTest {
     PostRepository postRepository;
     @MockBean
     PostImageRepository postImageRepository;
+    @MockBean
+    TagMappingRepository tagMappingRepository;
     @Autowired
     MockMvc mockMvc;
     ObjectMapper objectMapper = new ObjectMapper();
@@ -76,8 +83,11 @@ class PostControllerTest {
                 PostImageFixture.postImage(2L, post),
                 PostImageFixture.postImage(3L, post)
         );
+        Tag tag = TagFixture.tag();
+        TagMapping tagMapping = TagMappingFixture.tagMapping(post, tag);
         given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
         given(postImageRepository.findByPostId(anyLong())).willReturn(postImages);
+        given(tagMappingRepository.findAllByPost(any())).willReturn(List.of(tagMapping));
 
 
         // when
@@ -89,7 +99,8 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.caption").value(post.getCaption()))
                 .andExpect(jsonPath("$.images[0]").value(postImages.get(0).getUrl()))
                 .andExpect(jsonPath("$.images[1]").value(postImages.get(1).getUrl()))
-                .andExpect(jsonPath("$.images[2]").value(postImages.get(2).getUrl()));
+                .andExpect(jsonPath("$.images[2]").value(postImages.get(2).getUrl()))
+                .andExpect(jsonPath("$.tags[0]").value(tag.getName()));
     }
 
     @Test
