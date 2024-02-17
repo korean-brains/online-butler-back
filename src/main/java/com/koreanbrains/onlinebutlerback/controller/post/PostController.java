@@ -2,12 +2,15 @@ package com.koreanbrains.onlinebutlerback.controller.post;
 
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
+import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
 import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
+import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
+import com.koreanbrains.onlinebutlerback.repository.post.PostScrollDto;
 import com.koreanbrains.onlinebutlerback.repository.tag.TagMappingRepository;
 import com.koreanbrains.onlinebutlerback.service.post.PostService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ public class PostController {
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
     private final TagMappingRepository tagMappingRepository;
+    private final PostQueryRepository postQueryRepository;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -59,5 +63,10 @@ public class PostController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePost(@PathVariable("postId") Long postId) {
         postService.deletePost(postId, 1L);
+    }
+
+    @GetMapping
+    public Scroll<PostScrollDto> scrollPost(@ModelAttribute PostScrollRequest request) {
+        return postQueryRepository.scrollPost(request.cursor(), request.tagName(), request.size());
     }
 }
