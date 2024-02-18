@@ -5,12 +5,15 @@ import com.koreanbrains.onlinebutlerback.common.fixtures.PostFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.PostImageFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.TagFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.TagMappingFixture;
+import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
 import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
+import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
+import com.koreanbrains.onlinebutlerback.repository.post.PostScrollDto;
 import com.koreanbrains.onlinebutlerback.repository.tag.TagMappingRepository;
 import com.koreanbrains.onlinebutlerback.service.post.PostService;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +47,9 @@ class PostControllerTest {
     PostImageRepository postImageRepository;
     @MockBean
     TagMappingRepository tagMappingRepository;
+    @MockBean
+    PostQueryRepository postQueryRepository;
+
     @Autowired
     MockMvc mockMvc;
     ObjectMapper objectMapper = new ObjectMapper();
@@ -143,6 +149,35 @@ class PostControllerTest {
 
         // then
         result.andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("포스트 목록을 무한스크롤로 조회한다")
+    void scrollPost() throws Exception {
+        // given
+        List<PostScrollDto> content = List.of(
+                new PostScrollDto(10L, "포스트 내용", List.of("고양이", "뚱냥이")),
+                new PostScrollDto(9L, "포스트 내용", List.of("고양이", "뚱냥이")),
+                new PostScrollDto(8L, "포스트 내용", List.of("고양이", "뚱냥이")),
+                new PostScrollDto(7L, "포스트 내용", List.of("고양이", "뚱냥이"))
+        );
+        given(postQueryRepository.scrollPost(anyLong(), anyString(), anyInt()))
+                .willReturn(new Scroll<>(content, 6L, null));
+
+        // when
+        ResultActions result = mockMvc.perform(get("/post")
+                .param("cursor", "11")
+                .param("size", "4")
+                .param("tagName", ""));
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.nextCursor").value(6))
+                .andExpect(jsonPath("$.nextSubCursor").isEmpty())
+                .andExpect(jsonPath("$.content.length()").value(4))
+                .andExpect(jsonPath("$.content[0].id").exists())
+                .andExpect(jsonPath("$.content[0].caption").exists())
+                .andExpect(jsonPath("$.content[0].tags").exists());
     }
 
 }
