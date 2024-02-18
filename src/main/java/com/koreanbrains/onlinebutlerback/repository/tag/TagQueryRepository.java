@@ -38,6 +38,6 @@ public class TagQueryRepository {
     }
 
     private BooleanExpression idGoe(Long id) {
-        return id == null ? null : tag.id.goe(id);
+        return id == null ? tag.id.goe(0) : tag.id.goe(id);
     }
 }

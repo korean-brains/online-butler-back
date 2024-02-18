@@ -31,9 +31,13 @@ class PostQueryRepositoryTest {
     TagRepository tagRepository;
     @Autowired
     TagMappingRepository tagMappingRepository;
+    @Autowired
+    EntityManager em;
 
     @BeforeEach
     void setup() {
+        em.createNativeQuery("ALTER TABLE post ALTER COLUMN id RESTART with 1").executeUpdate();
+
         List<Tag> tags = tagRepository.saveAll(List.of(
                 Tag.builder().name("태그 1").build(),
                 Tag.builder().name("태그 2").build()
