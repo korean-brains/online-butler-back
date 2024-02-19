@@ -3,10 +3,18 @@ package com.koreanbrains.onlinebutlerback.controller.post;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koreanbrains.onlinebutlerback.common.fixtures.PostFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.PostImageFixture;
+import com.koreanbrains.onlinebutlerback.common.fixtures.TagFixture;
+import com.koreanbrains.onlinebutlerback.common.fixtures.TagMappingFixture;
+import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
+import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
+import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
+import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
+import com.koreanbrains.onlinebutlerback.repository.post.PostScrollDto;
+import com.koreanbrains.onlinebutlerback.repository.tag.TagMappingRepository;
 import com.koreanbrains.onlinebutlerback.service.post.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +45,11 @@ class PostControllerTest {
     PostRepository postRepository;
     @MockBean
     PostImageRepository postImageRepository;
+    @MockBean
+    TagMappingRepository tagMappingRepository;
+    @MockBean
+    PostQueryRepository postQueryRepository;
+
     @Autowired
     MockMvc mockMvc;
     ObjectMapper objectMapper = new ObjectMapper();
@@ -45,8 +58,8 @@ class PostControllerTest {
     @DisplayName("포스트를 생성한다")
     void createPost() throws Exception {
         // given
-        given(postService.createPost(any(), any())).willReturn(1L);
-        PostCreateRequest request = new PostCreateRequest("포스트 내용");
+        given(postService.createPost(any(), any(), any())).willReturn(1L);
+        PostCreateRequest request = new PostCreateRequest("포스트 내용", new String[]{"뚱냥이", "고양이"});
         MockMultipartFile post = new MockMultipartFile("post",
                 "post.json",
                 MediaType.APPLICATION_JSON_VALUE,
@@ -76,8 +89,11 @@ class PostControllerTest {
                 PostImageFixture.postImage(2L, post),
                 PostImageFixture.postImage(3L, post)
         );
+        Tag tag = TagFixture.tag();
+        TagMapping tagMapping = TagMappingFixture.tagMapping(post, tag);
         given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
         given(postImageRepository.findByPostId(anyLong())).willReturn(postImages);
+        given(tagMappingRepository.findAllByPost(any())).willReturn(List.of(tagMapping));
 
 
         // when
@@ -89,7 +105,8 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.caption").value(post.getCaption()))
                 .andExpect(jsonPath("$.images[0]").value(postImages.get(0).getUrl()))
                 .andExpect(jsonPath("$.images[1]").value(postImages.get(1).getUrl()))
-                .andExpect(jsonPath("$.images[2]").value(postImages.get(2).getUrl()));
+                .andExpect(jsonPath("$.images[2]").value(postImages.get(2).getUrl()))
+                .andExpect(jsonPath("$.tags[0]").value(tag.getName()));
     }
 
     @Test
@@ -109,8 +126,8 @@ class PostControllerTest {
     @DisplayName("포스트 내용을 수정한다")
     void updatePost() throws Exception {
         // given
-        doNothing().when(postService).updatePost(anyLong(), anyString(), anyLong());
-        PostUpdateRequest request = new PostUpdateRequest("수정된 포스트 내용");
+        doNothing().when(postService).updatePost(anyLong(), anyString(), any(), anyLong());
+        PostUpdateRequest request = new PostUpdateRequest("수정된 포스트 내용", new String[]{"뚱냥이", "고양이"});
 
         // when
         ResultActions result = mockMvc.perform(patch("/post/{postId}", 1)
@@ -132,6 +149,35 @@ class PostControllerTest {
 
         // then
         result.andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("포스트 목록을 무한스크롤로 조회한다")
+    void scrollPost() throws Exception {
+        // given
+        List<PostScrollDto> content = List.of(
+                new PostScrollDto(10L, "포스트 내용", List.of("고양이", "뚱냥이")),
+                new PostScrollDto(9L, "포스트 내용", List.of("고양이", "뚱냥이")),
+                new PostScrollDto(8L, "포스트 내용", List.of("고양이", "뚱냥이")),
+                new PostScrollDto(7L, "포스트 내용", List.of("고양이", "뚱냥이"))
+        );
+        given(postQueryRepository.scrollPost(anyLong(), anyString(), anyInt()))
+                .willReturn(new Scroll<>(content, 6L, null));
+
+        // when
+        ResultActions result = mockMvc.perform(get("/post")
+                .param("cursor", "11")
+                .param("size", "4")
+                .param("tagName", ""));
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.nextCursor").value(6))
+                .andExpect(jsonPath("$.nextSubCursor").isEmpty())
+                .andExpect(jsonPath("$.content.length()").value(4))
+                .andExpect(jsonPath("$.content[0].id").exists())
+                .andExpect(jsonPath("$.content[0].caption").exists())
+                .andExpect(jsonPath("$.content[0].tags").exists());
     }
 
 }

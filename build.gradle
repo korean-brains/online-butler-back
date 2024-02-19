@@ -42,6 +42,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
+    //Query logging
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+
     //aws s3 추가
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
@@ -95,6 +98,7 @@ jacocoTestReport {
                             '**/*Application*',
                             '**/common/config/**',
                             '**/common/exception/**',
+                            '**/common/util/p6spy/**'
                     ] + Qdomains)
                 })
         )
@@ -131,6 +135,7 @@ jacocoTestCoverageVerification {
                     '**.*Application*',
                     '**.common.config.**',
                     '**.common.exception.**',
+                    '**.common.util.p6spy.**'
             ] + Qdomains
         }
     }

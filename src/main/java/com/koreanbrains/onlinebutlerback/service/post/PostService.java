@@ -9,6 +9,7 @@ import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
+import com.koreanbrains.onlinebutlerback.service.tag.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,15 +26,17 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
+    private final TagService tagService;
     private final S3Client s3Client;
 
     @Transactional
-    public Long createPost(String caption, MultipartFile[] images) {
+    public Long createPost(String caption, MultipartFile[] images, String[] tags) {
         Post post = Post.builder()
                 .caption(caption)
                 .build();
-
         Long postId = postRepository.save(post).getId();
+
+        tagService.linkTags(post, tags);
 
         for (MultipartFile image : images) {
             UploadFile uploadFile = s3Client.upload(image, UUID.randomUUID().toString());
@@ -52,7 +55,7 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePost(Long postId, String caption, Long memberId) {
+    public void updatePost(Long postId, String caption, String[] tags, Long memberId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.POST_NOT_FOUND));
 
@@ -61,6 +64,8 @@ public class PostService {
         }
 
         post.changeCaption(caption);
+        tagService.resetTags(post.getId());
+        tagService.linkTags(post, tags);
     }
 
     @Transactional
@@ -74,6 +79,7 @@ public class PostService {
                 s3Client.delete(postImage.getStoredName());
             }
             postImageRepository.deleteAll(postImages);
+            tagService.resetTags(post.getId());
             postRepository.delete(post);
         });
     }
