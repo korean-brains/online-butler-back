@@ -1,4 +1,4 @@
-package com.koreanbrains.onlinebutlerback.common.util.P6spy;
+package com.koreanbrains.onlinebutlerback.common.util.p6spy;
 
 import com.p6spy.engine.common.P6Util;
 import com.p6spy.engine.logging.Category;

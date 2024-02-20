@@ -1,5 +1,6 @@
 package com.koreanbrains.onlinebutlerback.service.members;
 
+import com.koreanbrains.onlinebutlerback.common.exception.BaseException;
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.fixtures.MemberFixture;
 import com.koreanbrains.onlinebutlerback.controller.members.MemberCreateRequest;
@@ -13,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -28,6 +30,8 @@ public class MemberServiceTest {
     MemberService memberService;
     @Mock
     MemberRepository memberRepository;
+    @Mock
+    PasswordEncoder passwordEncoder;
 
     @Test
     @DisplayName("멤버가 생성되는지 확인한다")
@@ -41,6 +45,19 @@ public class MemberServiceTest {
 
         // then
         assertThat(memberId).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("이메일이 중복되면 400에러가 발생한다")
+    void failCreateMember() {
+        // given
+        given(memberRepository.existsByEmail(any())).willReturn(true);
+
+        // when
+
+        // then
+        assertThatThrownBy(() -> memberService.createMember("kim", "kim@gmail.com", "asdfasdf"))
+                .isInstanceOf(BaseException.class);
     }
 
     @Test

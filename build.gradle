@@ -103,6 +103,11 @@ jacocoTestReport {
                             '**/*Application*',
                             '**/common/config/**',
                             '**/common/exception/**',
+                            '**/common/util/p6spy/**',
+
+                            '**/security/**/*Dto*',
+                            '**/security/config/**',
+                            '**/security/entity/**'
                     ] + Qdomains)
                 })
         )
@@ -139,6 +144,11 @@ jacocoTestCoverageVerification {
                     '**.*Application*',
                     '**.common.config.**',
                     '**.common.exception.**',
+                    '**.common.util.p6spy.**',
+
+                    '**.security.**.*Dto*',
+                    '**.security.config.**',
+                    '**.security.entity.**'
             ] + Qdomains
         }
     }

@@ -1,4 +1,4 @@
-package com.koreanbrains.onlinebutlerback.common.util.P6spy;
+package com.koreanbrains.onlinebutlerback.common.util.p6spy;
 
 import com.p6spy.engine.spy.P6SpyOptions;
 import jakarta.annotation.PostConstruct;
