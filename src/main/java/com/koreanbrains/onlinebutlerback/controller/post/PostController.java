@@ -16,7 +16,6 @@ import com.koreanbrains.onlinebutlerback.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -33,8 +32,8 @@ public class PostController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Long createPost(@RequestPart("post") PostCreateRequest request, @RequestPart("images") MultipartFile[] images) {
-        return postService.createPost(request.caption(), images, request.tags());
+    public Long createPost(@ModelAttribute PostCreateRequest request) {
+        return postService.createPost(request.caption(), request.images(), request.tags());
     }
 
     @GetMapping("/{postId}")

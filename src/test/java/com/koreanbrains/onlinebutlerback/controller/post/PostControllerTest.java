@@ -59,11 +59,6 @@ class PostControllerTest {
     void createPost() throws Exception {
         // given
         given(postService.createPost(any(), any(), any())).willReturn(1L);
-        PostCreateRequest request = new PostCreateRequest("포스트 내용", new String[]{"뚱냥이", "고양이"});
-        MockMultipartFile post = new MockMultipartFile("post",
-                "post.json",
-                MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsBytes(request));
         MockMultipartFile images = new MockMultipartFile("images",
                 "cat.jpg",
                 MediaType.IMAGE_JPEG_VALUE,
@@ -71,8 +66,9 @@ class PostControllerTest {
 
         // when
         ResultActions result = mockMvc.perform(multipart("/post")
-                .file(post)
-                .file(images));
+                .file(images)
+                .param("caption", "포스트 내용")
+                .param("tags", "뚱냥이", "고양이"));
 
         // then
         result.andExpect(status().isCreated())
