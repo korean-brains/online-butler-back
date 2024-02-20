@@ -1,4 +1,6 @@
 package com.koreanbrains.onlinebutlerback.controller.post;
 
-public record PostCreateRequest(String caption, String[] tags) {
+import org.springframework.web.multipart.MultipartFile;
+
+public record PostCreateRequest(String caption, String[] tags, MultipartFile[] images) {
 }
