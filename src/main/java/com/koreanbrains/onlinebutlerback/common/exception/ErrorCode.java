@@ -14,12 +14,13 @@ public enum ErrorCode {
     //404
     POST_NOT_FOUND(404, "P_001", "포스트를 찾을 수 없습니다."),
     MEMBER_NOT_FOUND(404, "M_001", "멤버를 찾을 수 없습니다."),
+    COMMENT_NOT_FOUND(404, "C_001", "댓글을 찾을 수 없습니다."),
 
     //500
     FILE_NOT_UPLOADED(500, "S3_001", "파일을 업로드하지 못했습니다."),
 
     ;
-    
+
     private final int status;
     private final String code;
     private final String message;
