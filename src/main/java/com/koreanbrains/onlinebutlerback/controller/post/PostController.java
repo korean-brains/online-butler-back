@@ -7,6 +7,8 @@ import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
 import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
+import com.koreanbrains.onlinebutlerback.repository.comment.CommentQueryRepository;
+import com.koreanbrains.onlinebutlerback.repository.comment.CommentScrollDto;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
@@ -30,6 +32,7 @@ public class PostController {
     private final PostImageRepository postImageRepository;
     private final TagMappingRepository tagMappingRepository;
     private final PostQueryRepository postQueryRepository;
+    private final CommentQueryRepository commentQueryRepository;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -69,4 +72,11 @@ public class PostController {
     public Scroll<PostScrollDto> scrollPost(@ModelAttribute PostScrollRequest request) {
         return postQueryRepository.scrollPost(request.cursor(), request.tagName(), request.size());
     }
+
+    @GetMapping("/{postId}/comment")
+    public Scroll<CommentScrollDto> scrollComment(@ModelAttribute CommentScrollRequest request) {
+        return commentQueryRepository.scrollComment(request.getPostId(), request.getCursor(), request.getSize());
+    }
+
+
 }
