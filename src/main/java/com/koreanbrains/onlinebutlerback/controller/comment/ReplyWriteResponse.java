@@ -1,4 +1,4 @@
 package com.koreanbrains.onlinebutlerback.controller.comment;
 
-public record ReplyWriteRequest(String text) {
+public record ReplyWriteResponse(Long commentId) {
 }

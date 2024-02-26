@@ -27,5 +27,13 @@ public class CommentController {
         commentService.deleteComment(commentId, 1L);
     }
 
+    // TODO : Security 적용
+    @PostMapping("/{commentId}/reply")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ReplyWriteResponse writeReply(@PathVariable("commentId") Long commentId, @RequestBody ReplyWriteRequest request) {
+        Long replyId = commentService.writeReply(commentId, 1L, request.text());
+        return new ReplyWriteResponse(replyId);
+    }
+
 
 }

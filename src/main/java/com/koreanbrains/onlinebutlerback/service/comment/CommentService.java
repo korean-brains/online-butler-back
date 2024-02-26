@@ -7,7 +7,6 @@ import com.koreanbrains.onlinebutlerback.entity.comment.Comment;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentRepository;
-import com.koreanbrains.onlinebutlerback.repository.comment.ReplyCommentRepository;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import java.util.Objects;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final ReplyCommentRepository replyCommentRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
@@ -49,11 +47,29 @@ public class CommentService {
 
         validateCommentPermission(memberId, findComment);
 
-        replyCommentRepository.deleteByComment(findComment);
+        if (findComment.getRoot() != null) {
+            commentRepository.deleteByRoot(findComment);
+        }
         commentRepository.delete(findComment);
     }
 
+    @Transactional
+    public Long writeReply(Long commentId, Long authorId, String text) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.COMMENT_NOT_FOUND));
+        Member author = memberRepository.findById(authorId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
+        Comment reply = Comment.builder()
+                .author(author)
+                .post(comment.getPost())
+                .root(comment.getRoot() == null ? comment : comment.getRoot())
+                .parent(comment)
+                .text(text)
+                .build();
+
+        return commentRepository.save(reply).getId();
+    }
 
     private void validateCommentPermission(Long memberId, Comment comment) {
         if(!Objects.equals(comment.getAuthor().getId(), memberId)) {

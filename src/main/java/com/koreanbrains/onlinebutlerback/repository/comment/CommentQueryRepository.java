@@ -34,6 +34,7 @@ public class CommentQueryRepository {
                 .from(comment)
                 .join(comment.author, member)
                 .where(comment.post.id.eq(postId),
+                        comment.root.isNull(),
                         commentIdGoe(cursor))
                 .limit(size + 1)
                 .fetch();
