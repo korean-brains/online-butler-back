@@ -11,4 +11,15 @@ public class CommentFixture {
                 .author(MemberFixture.member())
                 .build();
     }
+
+    public static Comment reply(Comment comment) {
+        return Comment.builder()
+                .id(2L)
+                .text("답글 내용")
+                .post(PostFixture.post())
+                .author(MemberFixture.member())
+                .root(comment.getRoot() == null ? comment : comment.getRoot())
+                .parent(comment)
+                .build();
+    }
 }
