@@ -10,6 +10,7 @@ import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
 import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
+import com.koreanbrains.onlinebutlerback.repository.comment.CommentQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
@@ -49,6 +50,8 @@ class PostControllerTest {
     TagMappingRepository tagMappingRepository;
     @MockBean
     PostQueryRepository postQueryRepository;
+    @MockBean
+    CommentQueryRepository commentQueryRepository;
 
     @Autowired
     MockMvc mockMvc;
