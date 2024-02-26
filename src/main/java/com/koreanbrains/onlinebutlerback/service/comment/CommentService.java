@@ -47,7 +47,7 @@ public class CommentService {
 
         validateCommentPermission(memberId, findComment);
 
-        if (findComment.getRoot() != null) {
+        if (findComment.getRoot() == null) {
             commentRepository.deleteByRoot(findComment);
         }
         commentRepository.delete(findComment);
