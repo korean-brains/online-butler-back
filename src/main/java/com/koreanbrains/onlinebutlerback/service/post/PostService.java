@@ -7,6 +7,7 @@ import com.koreanbrains.onlinebutlerback.common.util.s3.S3Client;
 import com.koreanbrains.onlinebutlerback.common.util.s3.UploadFile;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
+import com.koreanbrains.onlinebutlerback.repository.comment.CommentRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
 import com.koreanbrains.onlinebutlerback.service.tag.TagService;
@@ -28,6 +29,7 @@ public class PostService {
     private final PostImageRepository postImageRepository;
     private final TagService tagService;
     private final S3Client s3Client;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public Long createPost(String caption, MultipartFile[] images, String[] tags) {
@@ -80,6 +82,7 @@ public class PostService {
             }
             postImageRepository.deleteAll(postImages);
             tagService.resetTags(post.getId());
+            commentRepository.deleteByPost(post);
             postRepository.delete(post);
         });
     }

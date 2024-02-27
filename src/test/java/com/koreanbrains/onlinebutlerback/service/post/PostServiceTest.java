@@ -9,6 +9,7 @@ import com.koreanbrains.onlinebutlerback.common.util.s3.S3Client;
 import com.koreanbrains.onlinebutlerback.common.util.s3.UploadFile;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
+import com.koreanbrains.onlinebutlerback.repository.comment.CommentRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
 import com.koreanbrains.onlinebutlerback.service.tag.TagService;
@@ -42,6 +43,8 @@ class PostServiceTest {
     PostImageRepository postImageRepository;
     @Mock
     TagService tagService;
+    @Mock
+    CommentRepository commentRepository;
 
 
     @Test
@@ -146,6 +149,7 @@ class PostServiceTest {
         doNothing().when(s3Client).delete(anyString());
         doNothing().when(postRepository).delete(any());
         doNothing().when(postImageRepository).deleteAll(anyList());
+        doNothing().when(commentRepository).deleteByPost(any());
 
         // when
         postService.deletePost(1L, 1L);

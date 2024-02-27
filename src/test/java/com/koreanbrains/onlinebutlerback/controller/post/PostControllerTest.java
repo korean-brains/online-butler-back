@@ -10,6 +10,8 @@ import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
 import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
+import com.koreanbrains.onlinebutlerback.repository.comment.CommentQueryRepository;
+import com.koreanbrains.onlinebutlerback.repository.comment.CommentScrollDto;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
@@ -27,6 +29,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +52,8 @@ class PostControllerTest {
     TagMappingRepository tagMappingRepository;
     @MockBean
     PostQueryRepository postQueryRepository;
+    @MockBean
+    CommentQueryRepository commentQueryRepository;
 
     @Autowired
     MockMvc mockMvc;
@@ -174,6 +179,36 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.content[0].id").exists())
                 .andExpect(jsonPath("$.content[0].caption").exists())
                 .andExpect(jsonPath("$.content[0].tags").exists());
+    }
+
+    @Test
+    @DisplayName("댓글 목록을 무한스크롤로 조회한다")
+    void scrollComment() throws Exception {
+        // given
+        List<CommentScrollDto> content = List.of(
+                new CommentScrollDto(1L, "포스트 내용", "kim", "profile image", LocalDateTime.of(2024, 2, 1, 10, 0)),
+                new CommentScrollDto(2L, "포스트 내용", "kim", "profile image", LocalDateTime.of(2024, 2, 1, 10, 1)),
+                new CommentScrollDto(3L, "포스트 내용", "kim", "profile image", LocalDateTime.of(2024, 2, 1, 10, 2)),
+                new CommentScrollDto(4L, "포스트 내용", "kim", "profile image", LocalDateTime.of(2024, 2, 1, 10, 3))
+        );
+        given(commentQueryRepository.scrollComment(anyLong(), anyLong(), anyInt()))
+                .willReturn(new Scroll<>(content, 5L, null));
+
+        // when
+        ResultActions result = mockMvc.perform(get("/post/{postId}/comment", 1)
+                .param("cursor", "0")
+                .param("size", "4"));
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.nextCursor").value(5))
+                .andExpect(jsonPath("$.nextSubCursor").isEmpty())
+                .andExpect(jsonPath("$.content.length()").value(4))
+                .andExpect(jsonPath("$.content[0].id").exists())
+                .andExpect(jsonPath("$.content[0].text").exists())
+                .andExpect(jsonPath("$.content[0].author").exists())
+                .andExpect(jsonPath("$.content[0].profile").exists())
+                .andExpect(jsonPath("$.content[0].createdAt").exists());
     }
 
 }
