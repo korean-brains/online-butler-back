@@ -18,11 +18,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Grant Permission Gradle
+      - name: Grant execute permission for Gradle Wrapper
         run: chmod +x gradlew
 
-      - name: Build with Gradle Wrapper
-        run: ./gradlew build
+      - name: Test with Gradle Wrapper
+        run: ./gradlew test
 
       - name: Jacoco Report
         uses: Madrapps/jacoco-report@v1.6.1
