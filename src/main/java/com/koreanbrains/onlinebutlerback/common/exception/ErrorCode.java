@@ -16,6 +16,8 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(404, "M_001", "멤버를 찾을 수 없습니다."),
     COMMENT_NOT_FOUND(404, "C_001", "댓글을 찾을 수 없습니다."),
     REPLY_NOT_FOUND(404, "RC_001", "답글을 찾을 수없습니다."),
+    LIKE_NOT_FOUND(404, "L_001", "좋아요를 찾을 수 없습니다."),
+    ALREADY_LIKE_POST(400, "L_002", "이미 좋아요를 누른 게시글입니다."),
 
     //500
     FILE_NOT_UPLOADED(500, "S3_001", "파일을 업로드하지 못했습니다."),
