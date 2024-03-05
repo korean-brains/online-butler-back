@@ -1,9 +1,13 @@
 package com.koreanbrains.onlinebutlerback.repository.post;
 
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
+import com.koreanbrains.onlinebutlerback.entity.like.Like;
+import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
 import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
+import com.koreanbrains.onlinebutlerback.repository.like.LikeRepository;
+import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import com.koreanbrains.onlinebutlerback.repository.tag.TagMappingRepository;
 import com.koreanbrains.onlinebutlerback.repository.tag.TagRepository;
 import jakarta.persistence.EntityManager;
@@ -32,7 +36,13 @@ class PostQueryRepositoryTest {
     @Autowired
     TagMappingRepository tagMappingRepository;
     @Autowired
+    LikeRepository likeRepository;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
     EntityManager em;
+
+    Member member;
 
     @BeforeEach
     void setup() {
@@ -60,6 +70,11 @@ class PostQueryRepositoryTest {
             for (Tag tag : tags) {
                 tagMappingRepository.save(TagMapping.builder().tag(tag).post(post).build());
             }
+        }
+
+        member = memberRepository.save(Member.builder().name("kim").email("kim@gmail.com").isActive(true).build());
+        for (Post post : posts) {
+            likeRepository.save(Like.builder().post(post).member(member).build());
         }
     }
 
@@ -128,6 +143,50 @@ class PostQueryRepositoryTest {
         assertThat(result.getContent().get(2).getCaption()).isEqualTo("포스트 8");
         assertThat(result.getContent().get(3).getCaption()).isEqualTo("포스트 7");
         assertThat(result.getContent().get(4).getCaption()).isEqualTo("포스트 6");
+    }
+
+    @Test
+    @DisplayName("좋아요한 게시글 목록을 무한스크롤로 조회한다")
+    void scrollLikePost() {
+        // given
+        Long cursor = null;
+        Long memberId = member.getId();
+        int size = 5;
+
+        // when
+        Scroll<LikePostScrollDto> result = postQueryRepository.scrollLikePost(cursor, memberId, size);
+
+        // then
+        assertThat(result.getNextCursor()).isEqualTo(5L);
+        assertThat(result.getNextSubCursor()).isNull();
+        assertThat(result.getContent().size()).isEqualTo(size);
+        assertThat(result.getContent().get(0).caption()).isEqualTo("포스트 10");
+        assertThat(result.getContent().get(1).caption()).isEqualTo("포스트 9");
+        assertThat(result.getContent().get(2).caption()).isEqualTo("포스트 8");
+        assertThat(result.getContent().get(3).caption()).isEqualTo("포스트 7");
+        assertThat(result.getContent().get(4).caption()).isEqualTo("포스트 6");
+    }
+
+    @Test
+    @DisplayName("좋아요한 게시글 목록 무한스크롤의 마지막 페이지를 조회한다")
+    void scrollLikePostLastPage() {
+        // given
+        Long cursor = 5L;
+        Long memberId = member.getId();
+        int size = 5;
+
+        // when
+        Scroll<LikePostScrollDto> result = postQueryRepository.scrollLikePost(cursor, memberId, size);
+
+        // then
+        assertThat(result.getNextCursor()).isNull();
+        assertThat(result.getNextSubCursor()).isNull();
+        assertThat(result.getContent().size()).isEqualTo(size);
+        assertThat(result.getContent().get(0).caption()).isEqualTo("포스트 5");
+        assertThat(result.getContent().get(1).caption()).isEqualTo("포스트 4");
+        assertThat(result.getContent().get(2).caption()).isEqualTo("포스트 3");
+        assertThat(result.getContent().get(3).caption()).isEqualTo("포스트 2");
+        assertThat(result.getContent().get(4).caption()).isEqualTo("포스트 1");
     }
 
 
