@@ -12,10 +12,7 @@ import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
 import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentScrollDto;
-import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
-import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
-import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
-import com.koreanbrains.onlinebutlerback.repository.post.PostScrollDto;
+import com.koreanbrains.onlinebutlerback.repository.post.*;
 import com.koreanbrains.onlinebutlerback.repository.tag.TagMappingRepository;
 import com.koreanbrains.onlinebutlerback.service.post.PostService;
 import org.junit.jupiter.api.DisplayName;
@@ -209,6 +206,33 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.content[0].author").exists())
                 .andExpect(jsonPath("$.content[0].profile").exists())
                 .andExpect(jsonPath("$.content[0].createdAt").exists());
+    }
+
+    @Test
+    @DisplayName("좋아요한 게시글을 무한스크롤로 조회한다")
+    void scrollLikePost() throws Exception {
+        // given
+        List<LikePostScrollDto> content = List.of(
+                new LikePostScrollDto(10L, "포스트 내용"),
+                new LikePostScrollDto(9L, "포스트 내용"),
+                new LikePostScrollDto(8L, "포스트 내용"),
+                new LikePostScrollDto(7L, "포스트 내용")
+        );
+        given(postQueryRepository.scrollLikePost(anyLong(), anyLong(), anyInt()))
+                .willReturn(new Scroll<>(content, 6L, null));
+
+        // when
+        ResultActions result = mockMvc.perform(get("/post/like")
+                .param("cursor", "11")
+                .param("size", "4"));
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.nextCursor").value(6))
+                .andExpect(jsonPath("$.nextSubCursor").isEmpty())
+                .andExpect(jsonPath("$.content.length()").value(4))
+                .andExpect(jsonPath("$.content[0].id").exists())
+                .andExpect(jsonPath("$.content[0].caption").exists());
     }
 
 }

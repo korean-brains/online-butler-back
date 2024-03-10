@@ -9,10 +9,7 @@ import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
 import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentScrollDto;
-import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
-import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
-import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
-import com.koreanbrains.onlinebutlerback.repository.post.PostScrollDto;
+import com.koreanbrains.onlinebutlerback.repository.post.*;
 import com.koreanbrains.onlinebutlerback.repository.tag.TagMappingRepository;
 import com.koreanbrains.onlinebutlerback.service.post.PostService;
 import lombok.RequiredArgsConstructor;
@@ -77,5 +74,10 @@ public class PostController {
         return commentQueryRepository.scrollComment(request.getPostId(), request.getCursor(), request.getSize());
     }
 
+    // TODO : Security 적용
+    @GetMapping("/like")
+    public Scroll<LikePostScrollDto> scrollLikePost(@ModelAttribute LikePostScrollRequest request) {
+        return postQueryRepository.scrollLikePost(request.cursor(), 1L, request.size());
+    }
 
 }

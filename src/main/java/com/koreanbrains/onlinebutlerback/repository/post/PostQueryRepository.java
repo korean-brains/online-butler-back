@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Objects;
 
+import static com.koreanbrains.onlinebutlerback.entity.like.QLike.*;
 import static com.koreanbrains.onlinebutlerback.entity.post.QPost.*;
 import static com.koreanbrains.onlinebutlerback.entity.tag.QTag.*;
 import static com.koreanbrains.onlinebutlerback.entity.tag.QTagMapping.*;
@@ -60,6 +61,27 @@ public class PostQueryRepository {
         Long nextCursor = null;
         if(posts.size() > size) {
             nextCursor = posts.get(posts.size() - 1).getId();
+            posts.remove(posts.size() - 1);
+        }
+
+        return new Scroll<>(posts, nextCursor, null);
+    }
+
+    public Scroll<LikePostScrollDto> scrollLikePost(Long cursor, Long memberId, int size) {
+        List<LikePostScrollDto> posts = queryFactory
+                .select(Projections.constructor(LikePostScrollDto.class,
+                        post.id,
+                        post.caption))
+                .from(post)
+                .join(like).on(like.post.id.eq(post.id))
+                .where(postIdLoe(cursor), like.member.id.eq(memberId))
+                .orderBy(post.id.desc())
+                .limit(size + 1)
+                .fetch();
+
+        Long nextCursor = null;
+        if(posts.size() > size) {
+            nextCursor = posts.get(posts.size() - 1).id();
             posts.remove(posts.size() - 1);
         }
 
