@@ -53,6 +53,9 @@ dependencies {
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    //Bootpay 추가
+    implementation 'io.github.bootpay:backend:+'
 }
 
 tasks.named('test') {
