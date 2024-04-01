@@ -1,6 +1,6 @@
 package com.koreanbrains.onlinebutlerback.service.donation;
 
-import com.koreanbrains.onlinebutlerback.common.exception.BootpayException;
+import com.koreanbrains.onlinebutlerback.common.exception.DonationException;
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.util.bootpay.BootpayClient;
@@ -35,7 +35,7 @@ public class DonationService {
         HashMap<String, Object> receipt = bootpayClient.getReceipt(receiptId);
 
         if(receipt.get("error_code") != null) {
-            throw new BootpayException(ErrorCode.BOOTPAY_CONFIRM_FAIL);
+            throw new DonationException(ErrorCode.DONATION_BOOTPAY_CONFIRM_FAIL);
         }
 
         int amount = (int) receipt.get("price");

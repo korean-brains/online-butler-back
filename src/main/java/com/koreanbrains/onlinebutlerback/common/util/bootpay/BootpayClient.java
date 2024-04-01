@@ -1,7 +1,7 @@
 package com.koreanbrains.onlinebutlerback.common.util.bootpay;
 
 
-import com.koreanbrains.onlinebutlerback.common.exception.BootpayException;
+import com.koreanbrains.onlinebutlerback.common.exception.DonationException;
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import kr.co.bootpay.Bootpay;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,12 +25,12 @@ public class BootpayClient {
             Bootpay bootpay = new Bootpay(applicationId, privateKey);
             HashMap<String, Object> token = bootpay.getAccessToken();
             if(token.get("error_code") != null) { //failed
-                throw new BootpayException(ErrorCode.BOOTPAY_ACCESSTOKEN);
+                throw new DonationException(ErrorCode.DONATION_BOOTPAY_ACCESSTOKEN);
             }
 
             return bootpay.getReceipt(receiptId);
         } catch (Exception e) {
-            throw new BootpayException(e, ErrorCode.BOOTPAY_ERORR);
+            throw new DonationException(e, ErrorCode.DONATION_BOOTPAY_ERORR);
         }
     }
 

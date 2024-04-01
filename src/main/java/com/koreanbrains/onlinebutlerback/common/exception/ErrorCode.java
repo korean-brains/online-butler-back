@@ -21,9 +21,9 @@ public enum ErrorCode {
 
     //500
     FILE_NOT_UPLOADED(500, "S3_001", "파일을 업로드하지 못했습니다."),
-    BOOTPAY_ACCESSTOKEN(500, "BP_001", "엑세스 토큰을 가져오지 못했습니다."),
-    BOOTPAY_ERORR(500, "BP_002", "부트페이 관련 에러가 발생했습니다."),
-    BOOTPAY_CONFIRM_FAIL(400, "BP_003", "결제 검증에 실패했습니다."),
+    DONATION_BOOTPAY_ACCESSTOKEN(500, "DN_001", "엑세스 토큰을 가져오지 못했습니다."),
+    DONATION_BOOTPAY_ERORR(500, "DN_002", "부트페이 관련 에러가 발생했습니다."),
+    DONATION_BOOTPAY_CONFIRM_FAIL(400, "DN_003", "결제 검증에 실패했습니다."),
 
     ;
 
