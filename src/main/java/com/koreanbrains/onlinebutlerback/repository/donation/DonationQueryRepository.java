@@ -38,16 +38,20 @@ public class DonationQueryRepository {
                 .limit(size)
                 .fetch();
 
-        Long totalCount = queryFactory.select(donation.count())
+        long totalCount = queryFactory.select(donation.count())
                 .from(donation)
                 .where(giverIdEq(giverId), betweenDate(start, end))
-                .fetchOne();
+                .fetchOne()
+                .longValue();
 
-        return new Page<>(result, number, size, totalCount == null ? 0 : totalCount);
+        return new Page<>(result, number, size, totalCount);
     }
 
     private BooleanExpression giverIdEq(Long id) {
-        return id == null ? null : donation.giver.id.eq(id);
+        if (id == null) {
+            throw new IllegalArgumentException(ErrorCode.DONATION_HISTORY_INVALID_GIVER_ID);
+        }
+        return donation.giver.id.eq(id);
     }
 
     private BooleanExpression betweenDate(LocalDateTime start, LocalDateTime end) {

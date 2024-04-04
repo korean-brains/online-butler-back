@@ -25,6 +25,7 @@ public enum ErrorCode {
     DONATION_BOOTPAY_ERORR(500, "DN_002", "부트페이 관련 에러가 발생했습니다."),
     DONATION_BOOTPAY_CONFIRM_FAIL(400, "DN_003", "결제 검증에 실패했습니다."),
     DONATION_HISTORY_INVALID_PAGE_NUMBER(400, "DN_004", "유효하지 않은 페이지 번호입니다."),
+    DONATION_HISTORY_INVALID_GIVER_ID(400, "DN_005", "유효하지 않은 기부자 ID입니다.")
 
     ;
 

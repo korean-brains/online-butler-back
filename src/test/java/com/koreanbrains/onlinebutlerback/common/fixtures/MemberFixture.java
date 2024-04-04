@@ -20,4 +20,13 @@ public class MemberFixture {
                 .password("asdfasdf")
                 .build();
     }
+
+    public static Member member(Long id, String name) {
+        return Member.builder()
+                .id(id)
+                .name(name)
+                .email(name + "@gmail.com")
+                .password("asdfasdf")
+                .build();
+    }
 }
