@@ -28,7 +28,7 @@ public class DonationQueryRepository {
 
         List<DonationGiveHistoryDto> result = queryFactory.select(Projections.constructor(DonationGiveHistoryDto.class,
                         donation.id,
-                        donation.giver.name,
+                        donation.receiver.name,
                         donation.amount,
                         donation.createdAt
                 ))
