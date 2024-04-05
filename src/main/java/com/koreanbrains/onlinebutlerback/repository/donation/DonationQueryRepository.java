@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.koreanbrains.onlinebutlerback.entity.donation.QDonation.*;
+import static com.koreanbrains.onlinebutlerback.entity.member.QMember.member;
 
 @Repository
 public class DonationQueryRepository {
@@ -33,6 +34,7 @@ public class DonationQueryRepository {
                         donation.createdAt
                 ))
                 .from(donation)
+                .join(donation.receiver, member)
                 .where(giverIdEq(giverId), betweenDate(start, end))
                 .offset((long) size * (number - 1)) // 페이지 번호 1부터 시작
                 .limit(size)
