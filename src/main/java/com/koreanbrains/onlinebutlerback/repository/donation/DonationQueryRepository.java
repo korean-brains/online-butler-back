@@ -49,6 +49,38 @@ public class DonationQueryRepository {
         return new Page<>(result, number, size, totalCount);
     }
 
+    public Page<DonationReceiveHistoryDto> findReceiveHistory(Long receiverId, int size, int number, LocalDateTime start, LocalDateTime end) {
+        validatePageNumber(number);
+
+        List<DonationReceiveHistoryDto> result = queryFactory.select(Projections.constructor(DonationReceiveHistoryDto.class,
+                        donation.id,
+                        donation.giver.name,
+                        donation.amount,
+                        donation.createdAt
+                ))
+                .from(donation)
+                .join(donation.giver, member)
+                .where(receiverId(receiverId), betweenDate(start, end))
+                .offset((long) size * (number - 1)) // 페이지 번호 1부터 시작
+                .limit(size)
+                .fetch();
+
+        long totalCount = queryFactory.select(donation.count())
+                .from(donation)
+                .where(receiverId(receiverId), betweenDate(start, end))
+                .fetchOne()
+                .longValue();
+
+        return new Page<>(result, number, size, totalCount);
+    }
+
+    private BooleanExpression receiverId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException(ErrorCode.DONATION_HISTORY_INVALID_RECEIVER_ID);
+        }
+        return donation.receiver.id.eq(id);
+    }
+
     private BooleanExpression giverIdEq(Long id) {
         if (id == null) {
             throw new IllegalArgumentException(ErrorCode.DONATION_HISTORY_INVALID_GIVER_ID);
