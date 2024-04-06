@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koreanbrains.onlinebutlerback.common.page.Page;
 import com.koreanbrains.onlinebutlerback.repository.donation.DonationGiveHistoryDto;
 import com.koreanbrains.onlinebutlerback.repository.donation.DonationQueryRepository;
+import com.koreanbrains.onlinebutlerback.repository.donation.DonationReceiveHistoryDto;
 import com.koreanbrains.onlinebutlerback.service.donation.DonationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -77,6 +78,47 @@ class DonationControllerTest {
 
         // when
         ResultActions result = mockMvc.perform(get("/donation/give")
+                .param("size", String.valueOf(request.getSize()))
+                .param("number", String.valueOf(request.getNumber()))
+                .param("start", request.getStart().format(dateTimeFormatter))
+                .param("end", request.getEnd().format(dateTimeFormatter)));
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(5))
+                .andExpect(jsonPath("$.number").value(1))
+                .andExpect(jsonPath("$.size").value(5))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.totalElements").value(10))
+                .andExpect(jsonPath("$.hasNext").value(true))
+                .andExpect(jsonPath("$.first").value(true));
+    }
+
+    @Test
+    @DisplayName("후원 받은 내역을 페이지네이션으로 조회한다.")
+    void findReceiveHistoryPagination() throws Exception {
+        // given
+        List<DonationReceiveHistoryDto> content = List.of(
+                new DonationReceiveHistoryDto(1L, "kim", 1000, LocalDateTime.of(2024, 4, 1, 0, 0)),
+                new DonationReceiveHistoryDto(2L, "kim", 1000, LocalDateTime.of(2024, 4, 1, 0, 1)),
+                new DonationReceiveHistoryDto(3L, "kim", 1000, LocalDateTime.of(2024, 4, 1, 0, 2)),
+                new DonationReceiveHistoryDto(4L, "kim", 1000, LocalDateTime.of(2024, 4, 1, 0, 3)),
+                new DonationReceiveHistoryDto(5L, "kim", 1000, LocalDateTime.of(2024, 4, 1, 0, 4))
+        );
+        given(donationQueryRepository.findReceiveHistory(anyLong(), anyInt(), anyInt(), any(), any()))
+                .willReturn(new Page<>(content, 1, 5, 10));
+
+        DonationReceiveHistoryGetRequest request = DonationReceiveHistoryGetRequest.builder()
+                .size(5)
+                .number(1)
+                .start(LocalDateTime.of(2024, 4, 1, 0, 0))
+                .end(LocalDateTime.of(2024, 4, 30, 0, 0))
+                .build();
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+        // when
+        ResultActions result = mockMvc.perform(get("/donation/receive")
                 .param("size", String.valueOf(request.getSize()))
                 .param("number", String.valueOf(request.getNumber()))
                 .param("start", request.getStart().format(dateTimeFormatter))
