@@ -19,10 +19,4 @@ public class FileController {
     public Resource downloadFile(@PathVariable("filename") String filename) {
         return fileStore.download(filename);
     }
-
-    @ResponseBody
-    @GetMapping("/assets/hello")
-    public String hello() {
-        return "hello";
-    }
 }
