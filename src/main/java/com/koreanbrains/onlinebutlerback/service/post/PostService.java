@@ -3,8 +3,8 @@ package com.koreanbrains.onlinebutlerback.service.post;
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.exception.PermissionDeniedException;
-import com.koreanbrains.onlinebutlerback.common.util.s3.S3Client;
-import com.koreanbrains.onlinebutlerback.common.util.s3.UploadFile;
+import com.koreanbrains.onlinebutlerback.common.util.file.FileStore;
+import com.koreanbrains.onlinebutlerback.common.util.file.UploadFile;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentRepository;
@@ -28,7 +28,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
     private final TagService tagService;
-    private final S3Client s3Client;
+    private final FileStore fileStore;
     private final CommentRepository commentRepository;
 
     @Transactional
@@ -41,7 +41,7 @@ public class PostService {
         tagService.linkTags(post, tags);
 
         for (MultipartFile image : images) {
-            UploadFile uploadFile = s3Client.upload(image, UUID.randomUUID().toString());
+            UploadFile uploadFile = fileStore.upload(image, UUID.randomUUID().toString());
 
             PostImage postImage = PostImage.builder()
                     .post(post)
@@ -78,7 +78,7 @@ public class PostService {
 
             List<PostImage> postImages = postImageRepository.findByPostId(postId);
             for (PostImage postImage : postImages) {
-                s3Client.delete(postImage.getStoredName());
+                fileStore.delete(postImage.getStoredName());
             }
             postImageRepository.deleteAll(postImages);
             tagService.resetTags(post.getId());

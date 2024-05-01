@@ -98,7 +98,9 @@ jacocoTestReport {
                             '**/*Application*',
                             '**/common/config/**',
                             '**/common/exception/**',
-                            '**/common/util/p6spy/**'
+                            '**/common/util/p6spy/**',
+                            '**/common/util/file/**',
+                            '**/controller/file/**'
                     ] + Qdomains)
                 })
         )
@@ -135,7 +137,9 @@ jacocoTestCoverageVerification {
                     '**.*Application*',
                     '**.common.config.**',
                     '**.common.exception.**',
-                    '**.common.util.p6spy.**'
+                    '**.common.util.p6spy.**',
+                    '**.common.util.file.**',
+                    '**.controller.file.**'
             ] + Qdomains
         }
     }

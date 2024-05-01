@@ -20,7 +20,10 @@ public enum ErrorCode {
     ALREADY_LIKE_POST(400, "L_002", "이미 좋아요를 누른 게시글입니다."),
 
     //500
-    FILE_NOT_UPLOADED(500, "S3_001", "파일을 업로드하지 못했습니다."),
+    FILE_NOT_UPLOADED(500, "F_001", "파일을 업로드하지 못했습니다."),
+    FILE_NOT_DELETED(500, "F_002", "파일을 삭제하지 못했습니다."),
+    FILE_INVALID(400, "F_003", "유효하지 않은 파일입니다."),
+    FILE_NOT_LOADED(500, "F_004", "파일을 로드할 수 없습니다."),
 
     ;
 

@@ -5,8 +5,8 @@ import com.koreanbrains.onlinebutlerback.common.exception.IOException;
 import com.koreanbrains.onlinebutlerback.common.exception.PermissionDeniedException;
 import com.koreanbrains.onlinebutlerback.common.fixtures.PostFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.PostImageFixture;
-import com.koreanbrains.onlinebutlerback.common.util.s3.S3Client;
-import com.koreanbrains.onlinebutlerback.common.util.s3.UploadFile;
+import com.koreanbrains.onlinebutlerback.common.util.file.FileStore;
+import com.koreanbrains.onlinebutlerback.common.util.file.UploadFile;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentRepository;
@@ -36,7 +36,7 @@ class PostServiceTest {
     PostService postService;
 
     @Mock
-    S3Client s3Client;
+    FileStore fileStore;
     @Mock
     PostRepository postRepository;
     @Mock
@@ -51,7 +51,7 @@ class PostServiceTest {
     @DisplayName("포스트가 생성되는지 확인한다.")
     void createPost() {
         // given
-        given(s3Client.upload(any(), anyString())).willReturn(new UploadFile("cat.jpg",
+        given(fileStore.upload(any(), anyString())).willReturn(new UploadFile("cat.jpg",
                 "9257a629-f0a3-4fc4-8264-77baf3092644.jpg",
                 "https://online-butler-s3.s3.ap-northeast-2.amazonaws.com/9257a629-f0a3-4fc4-8264-77baf3092644.jpg"));
 
@@ -78,7 +78,7 @@ class PostServiceTest {
     @DisplayName("이미지가 업로드 되지 않으면 예외가 발생한다")
     void failUploadImage() {
         // given
-        given(s3Client.upload(any(), anyString())).willThrow(IOException.class);
+        given(fileStore.upload(any(), anyString())).willThrow(IOException.class);
         given(postRepository.save(any())).willReturn(Post.builder().id(1L).build());
 
         String caption = "포스트 내용";
@@ -146,7 +146,7 @@ class PostServiceTest {
                 );
         given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
         given(postImageRepository.findByPostId(anyLong())).willReturn(postImages);
-        doNothing().when(s3Client).delete(anyString());
+        doNothing().when(fileStore).delete(anyString());
         doNothing().when(postRepository).delete(any());
         doNothing().when(postImageRepository).deleteAll(anyList());
         doNothing().when(commentRepository).deleteByPost(any());
@@ -157,7 +157,7 @@ class PostServiceTest {
         // then
         then(postRepository).should().delete(post);
         then(postImageRepository).should().deleteAll(postImages);
-        then(s3Client).should(times(3)).delete(anyString());
+        then(fileStore).should(times(3)).delete(anyString());
     }
 
     @Test
