@@ -25,7 +25,7 @@ public enum ErrorCode {
     DONATION_BOOTPAY_CONFIRM_FAIL(400, "DN_003", "결제 검증에 실패했습니다."),
     DONATION_HISTORY_INVALID_PAGE_NUMBER(400, "DN_004", "유효하지 않은 페이지 번호입니다."),
     DONATION_HISTORY_INVALID_GIVER_ID(400, "DN_005", "유효하지 않은 기부자 ID입니다."),
-    DONATION_HISTORY_INVALID_RECEIVER_ID(400, "DN_005", "유효하지 않은 수령자 ID입니다.")
+    DONATION_HISTORY_INVALID_RECEIVER_ID(400, "DN_005", "유효하지 않은 수령자 ID입니다."),
       
     FILE_NOT_UPLOADED(500, "F_001", "파일을 업로드하지 못했습니다."),
     FILE_NOT_DELETED(500, "F_002", "파일을 삭제하지 못했습니다."),
