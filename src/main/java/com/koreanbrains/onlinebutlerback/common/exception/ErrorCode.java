@@ -20,13 +20,17 @@ public enum ErrorCode {
     ALREADY_LIKE_POST(400, "L_002", "이미 좋아요를 누른 게시글입니다."),
 
     //500
-    FILE_NOT_UPLOADED(500, "S3_001", "파일을 업로드하지 못했습니다."),
     DONATION_BOOTPAY_ACCESSTOKEN(500, "DN_001", "엑세스 토큰을 가져오지 못했습니다."),
     DONATION_BOOTPAY_ERORR(500, "DN_002", "부트페이 관련 에러가 발생했습니다."),
     DONATION_BOOTPAY_CONFIRM_FAIL(400, "DN_003", "결제 검증에 실패했습니다."),
     DONATION_HISTORY_INVALID_PAGE_NUMBER(400, "DN_004", "유효하지 않은 페이지 번호입니다."),
     DONATION_HISTORY_INVALID_GIVER_ID(400, "DN_005", "유효하지 않은 기부자 ID입니다."),
     DONATION_HISTORY_INVALID_RECEIVER_ID(400, "DN_005", "유효하지 않은 수령자 ID입니다.")
+      
+    FILE_NOT_UPLOADED(500, "F_001", "파일을 업로드하지 못했습니다."),
+    FILE_NOT_DELETED(500, "F_002", "파일을 삭제하지 못했습니다."),
+    FILE_INVALID(400, "F_003", "유효하지 않은 파일입니다."),
+    FILE_NOT_LOADED(500, "F_004", "파일을 로드할 수 없습니다."),
 
     ;
 

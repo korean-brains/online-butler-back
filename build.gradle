@@ -102,7 +102,9 @@ jacocoTestReport {
                             '**/common/config/**',
                             '**/common/exception/**',
                             '**/common/util/p6spy/**',
-                            '**/common/util/bootpay/**'
+                            '**/common/util/bootpay/**',
+                            '**/common/util/file/**',
+                            '**/controller/file/**'
                     ] + Qdomains)
                 })
         )
@@ -140,7 +142,9 @@ jacocoTestCoverageVerification {
                     '**.common.config.**',
                     '**.common.exception.**',
                     '**.common.util.p6spy.**',
-                    '**.common.util.bootpay.**'
+                    '**.common.util.bootpay.**',
+                    '**.common.util.file.**',
+                    '**.controller.file.**'
             ] + Qdomains
         }
     }
