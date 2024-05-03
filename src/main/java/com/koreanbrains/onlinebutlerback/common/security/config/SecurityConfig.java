@@ -1,7 +1,12 @@
 package com.koreanbrains.onlinebutlerback.common.security.config;
 
 import com.koreanbrains.onlinebutlerback.common.security.dsl.RestApiDsl;
+import com.koreanbrains.onlinebutlerback.common.security.entrypoint.RestAuthenticationEntryPoint;
+import com.koreanbrains.onlinebutlerback.common.security.filter.RestAuthorizationFilter;
+import com.koreanbrains.onlinebutlerback.common.security.handler.RestAccessDeniedHandler;
+import com.koreanbrains.onlinebutlerback.common.security.jwt.JwtProvider;
 import com.koreanbrains.onlinebutlerback.common.security.provider.RestAuthenticationProvider;
+import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +28,8 @@ public class SecurityConfig {
     private final RestAuthenticationProvider authenticationProvider;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final AuthenticationFailureHandler authenticationFailureHandler;
+    private final JwtProvider jwtProvider;
+    private final MemberRepository memberRepository;
 
     @Bean
     public SecurityFilterChain restSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -38,11 +45,16 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilter(new RestAuthorizationFilter(authenticationManager, jwtProvider, memberRepository))
                 .authenticationManager(authenticationManager)
                 .with(new RestApiDsl<>(), restDsl -> restDsl
                         .restSuccessHandler(authenticationSuccessHandler)
                         .restFailureHandler(authenticationFailureHandler)
                         .loginProcessingUrl("/api/login")
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new RestAuthenticationEntryPoint())
+                        .accessDeniedHandler(new RestAccessDeniedHandler())
                 )
         ;
 

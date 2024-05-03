@@ -1,4 +1,4 @@
-package com.koreanbrains.onlinebutlerback.controller.auth;
+package com.koreanbrains.onlinebutlerback.common.security.controller;
 
 import com.koreanbrains.onlinebutlerback.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
