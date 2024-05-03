@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Entity
 @Getter
@@ -23,8 +22,13 @@ public class Member extends BaseTimeEntity {
     private String email;
     private String password;
 
+    @Builder.Default
+    @ColumnDefault("ROLE_USER")
+    private String role = "ROLE_USER";
+
+    @Builder.Default
     @ColumnDefault("true")
-    private boolean isActive;
+    private boolean isActive = true;
 
     public void updateName(String name) {
         this.name = name;

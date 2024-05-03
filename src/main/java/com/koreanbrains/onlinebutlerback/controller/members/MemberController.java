@@ -1,7 +1,6 @@
 package com.koreanbrains.onlinebutlerback.controller.members;
 
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
-import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import com.koreanbrains.onlinebutlerback.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
-    private final MemberRepository memberRepository;
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Long createMember(@RequestBody MemberCreateRequest dto){
