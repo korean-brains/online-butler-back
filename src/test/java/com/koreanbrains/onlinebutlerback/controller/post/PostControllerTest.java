@@ -67,7 +67,7 @@ class PostControllerTest {
                 "<<image>>".getBytes());
 
         // when
-        ResultActions result = mockMvc.perform(multipart("/post")
+        ResultActions result = mockMvc.perform(multipart("/api/post")
                 .file(images)
                 .param("caption", "포스트 내용")
                 .param("tags", "뚱냥이", "고양이"));
@@ -95,7 +95,7 @@ class PostControllerTest {
 
 
         // when
-        ResultActions result = mockMvc.perform(get("/post/{postId}", 1));
+        ResultActions result = mockMvc.perform(get("/api/post/{postId}", 1));
 
         // then
         result.andExpect(status().isOk())
@@ -114,7 +114,7 @@ class PostControllerTest {
         given(postRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when
-        ResultActions result = mockMvc.perform(get("/post/{postId}", 1));
+        ResultActions result = mockMvc.perform(get("/api/post/{postId}", 1));
 
         // then
         result.andExpect(status().isNotFound());
@@ -128,7 +128,7 @@ class PostControllerTest {
         PostUpdateRequest request = new PostUpdateRequest("수정된 포스트 내용", new String[]{"뚱냥이", "고양이"});
 
         // when
-        ResultActions result = mockMvc.perform(patch("/post/{postId}", 1)
+        ResultActions result = mockMvc.perform(patch("/api/post/{postId}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(request)));
 
@@ -143,7 +143,7 @@ class PostControllerTest {
         doNothing().when(postService).deletePost(anyLong(), anyLong());
 
         // when
-        ResultActions result = mockMvc.perform(delete("/post/{postId}", 1));
+        ResultActions result = mockMvc.perform(delete("/api/post/{postId}", 1));
 
         // then
         result.andExpect(status().isNoContent());
@@ -163,7 +163,7 @@ class PostControllerTest {
                 .willReturn(new Scroll<>(content, 6L, null));
 
         // when
-        ResultActions result = mockMvc.perform(get("/post")
+        ResultActions result = mockMvc.perform(get("/api/post")
                 .param("cursor", "11")
                 .param("size", "4")
                 .param("tagName", ""));
@@ -192,7 +192,7 @@ class PostControllerTest {
                 .willReturn(new Scroll<>(content, 5L, null));
 
         // when
-        ResultActions result = mockMvc.perform(get("/post/{postId}/comment", 1)
+        ResultActions result = mockMvc.perform(get("/api/post/{postId}/comment", 1)
                 .param("cursor", "0")
                 .param("size", "4"));
 
@@ -222,7 +222,7 @@ class PostControllerTest {
                 .willReturn(new Scroll<>(content, 6L, null));
 
         // when
-        ResultActions result = mockMvc.perform(get("/post/like")
+        ResultActions result = mockMvc.perform(get("/api/post/like")
                 .param("cursor", "11")
                 .param("size", "4"));
 

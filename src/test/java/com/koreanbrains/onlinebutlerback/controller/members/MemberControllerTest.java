@@ -43,7 +43,7 @@ class MemberControllerTest {
         MemberCreateRequest request = new MemberCreateRequest("kim", "kin@gmail.com", "password");
 
         // when
-        ResultActions result = mockMvc.perform(post("/member")
+        ResultActions result = mockMvc.perform(post("/api/member")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(request)));
 
@@ -60,7 +60,7 @@ class MemberControllerTest {
         given(memberService.getMember(anyLong())).willReturn(member);
 
         // when
-        ResultActions result = mockMvc.perform(get("/member/{memberId}", 1));
+        ResultActions result = mockMvc.perform(get("/api/member/{memberId}", 1));
 
         // then
         result.andExpect(status().isOk())
@@ -76,7 +76,7 @@ class MemberControllerTest {
         given(memberService.getMember(anyLong())).willThrow(new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         // when
-        ResultActions result = mockMvc.perform(get("/member/{memberId}", 1));
+        ResultActions result = mockMvc.perform(get("/api/member/{memberId}", 1));
 
         // then
         result.andExpect(status().isNotFound());
@@ -90,7 +90,7 @@ class MemberControllerTest {
         MemberUpdateRequest request = new MemberUpdateRequest("lee");
 
         // when
-        ResultActions result = mockMvc.perform(patch("/member/{memberId}", 1)
+        ResultActions result = mockMvc.perform(patch("/api/member/{memberId}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(request)));
 
@@ -106,7 +106,7 @@ class MemberControllerTest {
         given(memberService.disableMember(anyLong())).willReturn(1L);
 
         // when
-        ResultActions result = mockMvc.perform(delete("/member/{memberId}", 1));
+        ResultActions result = mockMvc.perform(delete("/api/member/{memberId}", 1));
 
         // then
         result.andExpect(status().isNoContent())

@@ -35,7 +35,7 @@ class LikeControllerTest {
         LikePostRequest request = new LikePostRequest(1L);
 
         // when
-        ResultActions result = mockMvc.perform(post("/like")
+        ResultActions result = mockMvc.perform(post("/api/like")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(request)));
 
@@ -51,7 +51,7 @@ class LikeControllerTest {
         DislikePostRequest request = new DislikePostRequest(1L);
 
         // when
-        ResultActions result = mockMvc.perform(delete("/like")
+        ResultActions result = mockMvc.perform(delete("/api/like")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(request)));
 
