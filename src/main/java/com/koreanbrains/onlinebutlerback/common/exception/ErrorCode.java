@@ -14,6 +14,7 @@ public enum ErrorCode {
     UNSUPPORTED_TOKEN(401, "JWT_004", "지원되지 않는 JWT 입니다."),
     INVALID_TOKEN(401, "JWT_005", "JWT가 잘못되었습니다."),
     NO_AUTHENTICATION_INFO(401, "JWT_006", "인증정보가 없습니다."),
+    INVALID_REFRESH_TOKEN(401, "JWT_007", "유효하지 않은 리프레시 토큰입니다."),
 
     //403
     PERMISSION_DENIED(403, "PM_001", "권한이 없습니다."),

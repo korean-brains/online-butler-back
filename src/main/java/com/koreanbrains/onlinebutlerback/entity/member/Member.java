@@ -23,7 +23,7 @@ public class Member extends BaseTimeEntity {
     private String password;
 
     @Builder.Default
-    @ColumnDefault("ROLE_USER")
+    @ColumnDefault("'ROLE_USER'")
     private String role = "ROLE_USER";
 
     @Builder.Default

@@ -20,6 +20,10 @@ public class JwtProvider {
         this.secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
     }
 
+    public TokenDto generateTokens(Long memberId) {
+        return new TokenDto(generateAccessToken(memberId), generateRefreshToken());
+    }
+
     public String generateAccessToken(Long memberId) {
         Date expireDate = new Date(new Date().getTime() + jwtProperties.getAccessTokenExpireTime());
 
@@ -50,6 +54,12 @@ public class JwtProvider {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token)
                 .getPayload()
                 .get("memberId", Long.class);
+    }
+
+    public Date getExpiration(String token) {
+        validateToken(token);
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token)
+                .getPayload().getExpiration();
     }
 
     public void validateToken(String token) {

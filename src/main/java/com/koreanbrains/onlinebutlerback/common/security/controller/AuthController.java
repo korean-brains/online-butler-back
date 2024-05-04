@@ -1,5 +1,7 @@
 package com.koreanbrains.onlinebutlerback.common.security.controller;
 
+import com.koreanbrains.onlinebutlerback.common.security.jwt.TokenDto;
+import com.koreanbrains.onlinebutlerback.common.security.service.RefreshTokenService;
 import com.koreanbrains.onlinebutlerback.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ public class AuthController {
 
     private final PasswordEncoder passwordEncoder;
     private final MemberService memberService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/api/signup")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -22,6 +25,11 @@ public class AuthController {
         memberService.createMember(request.name(),
                 request.email(),
                 passwordEncoder.encode(request.password()));
+    }
+
+    @PostMapping("/api/reissue-token")
+    public TokenDto reissueToken(@RequestBody ReissueTokenRequest request) {
+        return refreshTokenService.reissue(request.refreshToken());
     }
 
 }
