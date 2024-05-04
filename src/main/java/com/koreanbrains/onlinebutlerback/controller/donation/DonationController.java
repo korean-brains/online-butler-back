@@ -1,12 +1,15 @@
 package com.koreanbrains.onlinebutlerback.controller.donation;
 
 import com.koreanbrains.onlinebutlerback.common.page.Page;
+import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
 import com.koreanbrains.onlinebutlerback.repository.donation.DonationGiveHistoryDto;
 import com.koreanbrains.onlinebutlerback.repository.donation.DonationQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.donation.DonationReceiveHistoryDto;
 import com.koreanbrains.onlinebutlerback.service.donation.DonationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -20,20 +23,25 @@ public class DonationController {
 
     @PostMapping("/verify")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("isAuthenticated()")
     public void verify(@RequestBody DonationRequest request) {
         donationService.save(request.receiptId(), request.giverId(), request.receiverId());
     }
 
-    // TODO : giverId security 적용
     @GetMapping("/give")
-    public Page<DonationGiveHistoryDto> getGiveHistory(@ModelAttribute DonationGiveHistoryGetRequest request) {
-        return donationQueryRepository.findGiveHistory(1L, request.getSize(), request.getNumber(), request.getStart(), request.getEnd());
+    @PreAuthorize("isAuthenticated()")
+    public Page<DonationGiveHistoryDto> getGiveHistory(@AuthenticationPrincipal AccountDto accountDto,
+                                                       @ModelAttribute DonationGiveHistoryGetRequest request) {
+
+        return donationQueryRepository.findGiveHistory(accountDto.getId(), request.getSize(), request.getNumber(), request.getStart(), request.getEnd());
     }
 
-    // TODO : giverId security 적용
     @GetMapping("/receive")
-    public Page<DonationReceiveHistoryDto> getReceiveHistory(@ModelAttribute DonationReceiveHistoryGetRequest request) {
-        return donationQueryRepository.findReceiveHistory(1L, request.getSize(), request.getNumber(), request.getStart(), request.getEnd());
+    @PreAuthorize("isAuthenticated()")
+    public Page<DonationReceiveHistoryDto> getReceiveHistory(@AuthenticationPrincipal AccountDto accountDto,
+                                                             @ModelAttribute DonationReceiveHistoryGetRequest request) {
+
+        return donationQueryRepository.findReceiveHistory(accountDto.getId(), request.getSize(), request.getNumber(), request.getStart(), request.getEnd());
     }
 
 }
