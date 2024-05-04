@@ -10,6 +10,7 @@ import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.entity.token.RefreshToken;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,5 +77,11 @@ public class RefreshTokenService {
         refreshTokenRepository.save(token);
 
         return tokenDto;
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // 매일 자정
+    @Transactional
+    public void deleteExpiredTokens() {
+        refreshTokenRepository.deleteByExpirationBefore(LocalDateTime.now());
     }
 }
