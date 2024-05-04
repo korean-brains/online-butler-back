@@ -1,11 +1,14 @@
 package com.koreanbrains.onlinebutlerback.controller.comment;
 
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
+import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.comment.ReplyScrollDto;
 import com.koreanbrains.onlinebutlerback.service.comment.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,26 +19,33 @@ public class CommentController {
     private final CommentService commentService;
     private final CommentQueryRepository commentQueryRepository;
 
-    // TODO : Security 적용
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CommentWriteResponse writeComment(@RequestBody CommentWriteRequest request) {
-        Long commentId = commentService.writeComment(request.postId(), 1L, request.text());
+    @PreAuthorize("isAuthenticated()")
+    public CommentWriteResponse writeComment(@AuthenticationPrincipal AccountDto accountDto,
+                                             @RequestBody CommentWriteRequest request) {
+
+        Long commentId = commentService.writeComment(request.postId(), accountDto.getId(), request.text());
         return new CommentWriteResponse(commentId);
     }
 
-    // TODO : Security 적용
     @DeleteMapping("/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteComment(@PathVariable("commentId") Long commentId) {
-        commentService.deleteComment(commentId, 1L);
+    @PreAuthorize("isAuthenticated()")
+    public void deleteComment(@AuthenticationPrincipal AccountDto accountDto,
+                              @PathVariable("commentId") Long commentId) {
+
+        commentService.deleteComment(commentId, accountDto.getId());
     }
 
-    // TODO : Security 적용
     @PostMapping("/{commentId}/reply")
     @ResponseStatus(HttpStatus.CREATED)
-    public ReplyWriteResponse writeReply(@PathVariable("commentId") Long commentId, @RequestBody ReplyWriteRequest request) {
-        Long replyId = commentService.writeReply(commentId, 1L, request.text());
+    @PreAuthorize("isAuthenticated()")
+    public ReplyWriteResponse writeReply(@AuthenticationPrincipal AccountDto accountDto,
+                                         @PathVariable("commentId") Long commentId,
+                                         @RequestBody ReplyWriteRequest request) {
+
+        Long replyId = commentService.writeReply(commentId, accountDto.getId(), request.text());
         return new ReplyWriteResponse(replyId);
     }
 
