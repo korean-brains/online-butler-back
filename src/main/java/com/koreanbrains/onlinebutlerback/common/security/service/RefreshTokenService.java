@@ -79,6 +79,14 @@ public class RefreshTokenService {
         return tokenDto;
     }
 
+    @Transactional
+    public void deleteRefreshTokenGroup(String refreshToken) {
+        RefreshToken findRefreshToken = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new AuthenticationException(ErrorCode.INVALID_REFRESH_TOKEN));
+
+        refreshTokenRepository.deleteByTokenGroup(findRefreshToken.getTokenGroup());
+    }
+
     @Scheduled(cron = "0 0 0 * * *") // 매일 자정
     @Transactional
     public void deleteExpiredTokens() {

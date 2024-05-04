@@ -32,4 +32,10 @@ public class AuthController {
         return refreshTokenService.reissue(request.refreshToken());
     }
 
+    @PostMapping("/api/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@RequestBody LogoutRequest request) {
+        refreshTokenService.deleteRefreshTokenGroup(request.refreshToken());
+    }
+
 }
