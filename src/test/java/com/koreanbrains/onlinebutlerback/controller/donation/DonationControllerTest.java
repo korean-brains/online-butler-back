@@ -1,6 +1,7 @@
 package com.koreanbrains.onlinebutlerback.controller.donation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.koreanbrains.onlinebutlerback.common.ControllerTest;
+import com.koreanbrains.onlinebutlerback.common.context.WithRestMockUser;
 import com.koreanbrains.onlinebutlerback.common.page.Page;
 import com.koreanbrains.onlinebutlerback.repository.donation.DonationGiveHistoryDto;
 import com.koreanbrains.onlinebutlerback.repository.donation.DonationQueryRepository;
@@ -8,12 +9,9 @@ import com.koreanbrains.onlinebutlerback.repository.donation.DonationReceiveHist
 import com.koreanbrains.onlinebutlerback.service.donation.DonationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
@@ -24,13 +22,8 @@ import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = DonationController.class,
-        excludeAutoConfiguration = SecurityAutoConfiguration.class)
-class DonationControllerTest {
-
-    @Autowired
-    MockMvc mockMvc;
-    ObjectMapper objectMapper = new ObjectMapper();
+@WebMvcTest(controllers = DonationController.class)
+class DonationControllerTest extends ControllerTest {
 
     @MockBean
     DonationService donationService;
@@ -39,6 +32,7 @@ class DonationControllerTest {
 
     @Test
     @DisplayName("클라이언트가 진행한 결제가 유효한지 검증한다.")
+    @WithRestMockUser
     void verify() throws Exception {
         // given
         doNothing().when(donationService).save(anyString(), anyLong(), anyLong());
@@ -55,6 +49,7 @@ class DonationControllerTest {
 
     @Test
     @DisplayName("후원 한 내역을 페이지네이션으로 조회한다.")
+    @WithRestMockUser
     void findGiveHistoryPagination() throws Exception {
         // given
         List<DonationGiveHistoryDto> content = List.of(
@@ -96,6 +91,7 @@ class DonationControllerTest {
 
     @Test
     @DisplayName("후원 받은 내역을 페이지네이션으로 조회한다.")
+    @WithRestMockUser
     void findReceiveHistoryPagination() throws Exception {
         // given
         List<DonationReceiveHistoryDto> content = List.of(

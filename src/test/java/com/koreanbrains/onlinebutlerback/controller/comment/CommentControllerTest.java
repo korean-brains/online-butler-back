@@ -1,18 +1,16 @@
 package com.koreanbrains.onlinebutlerback.controller.comment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.koreanbrains.onlinebutlerback.common.ControllerTest;
+import com.koreanbrains.onlinebutlerback.common.context.WithRestMockUser;
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.comment.ReplyScrollDto;
 import com.koreanbrains.onlinebutlerback.service.comment.CommentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
@@ -22,21 +20,19 @@ import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = CommentController.class,
-        excludeAutoConfiguration = SecurityAutoConfiguration.class)
-class CommentControllerTest {
+
+@WebMvcTest(controllers = CommentController.class)
+class CommentControllerTest extends ControllerTest {
 
     @MockBean
     CommentService commentService;
     @MockBean
     CommentQueryRepository commentQueryRepository;
 
-    @Autowired
-    MockMvc mockMvc;
-    ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     @DisplayName("댓글을 작성한다")
+    @WithRestMockUser
     void writeComment() throws Exception {
         // given
         given(commentService.writeComment(anyLong(), anyLong(), anyString())).willReturn(1L);
@@ -54,6 +50,7 @@ class CommentControllerTest {
 
     @Test
     @DisplayName("댓글을 삭제한다")
+    @WithRestMockUser
     void deleteComment() throws Exception {
         // given
         doNothing().when(commentService).deleteComment(anyLong(), anyLong());
@@ -67,6 +64,7 @@ class CommentControllerTest {
 
     @Test
     @DisplayName("답글을 작성한다")
+    @WithRestMockUser
     void writeReply() throws Exception {
         // given
         given(commentService.writeReply(anyLong(), anyLong(), anyString())).willReturn(1L);

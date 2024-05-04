@@ -3,6 +3,7 @@ package com.koreanbrains.onlinebutlerback.service.post;
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.exception.IOException;
 import com.koreanbrains.onlinebutlerback.common.exception.PermissionDeniedException;
+import com.koreanbrains.onlinebutlerback.common.fixtures.MemberFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.PostFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.PostImageFixture;
 import com.koreanbrains.onlinebutlerback.common.util.file.FileStore;
@@ -10,6 +11,7 @@ import com.koreanbrains.onlinebutlerback.common.util.file.UploadFile;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentRepository;
+import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
 import com.koreanbrains.onlinebutlerback.service.tag.TagService;
@@ -45,6 +47,8 @@ class PostServiceTest {
     TagService tagService;
     @Mock
     CommentRepository commentRepository;
+    @Mock
+    MemberRepository memberRepository;
 
 
     @Test
@@ -65,10 +69,11 @@ class PostServiceTest {
 
         given(postRepository.save(any())).willReturn(Post.builder().id(1L).build());
         given(postImageRepository.save(any())).willReturn(PostImage.builder().build());
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(MemberFixture.member()));
         doNothing().when(tagService).linkTags(any(), any());
 
         // when
-        Long postId = postService.createPost(caption, images, tags);
+        Long postId = postService.createPost(caption, images, tags, 1L);
 
         // then
         assertThat(postId).isEqualTo(1L);
@@ -80,6 +85,7 @@ class PostServiceTest {
         // given
         given(fileStore.upload(any(), anyString())).willThrow(IOException.class);
         given(postRepository.save(any())).willReturn(Post.builder().id(1L).build());
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(MemberFixture.member()));
 
         String caption = "포스트 내용";
         MockMultipartFile[] images = {
@@ -91,7 +97,7 @@ class PostServiceTest {
         
         // when
         // then
-        assertThatThrownBy(() -> postService.createPost(caption, images, tags))
+        assertThatThrownBy(() -> postService.createPost(caption, images, tags, 1L))
                 .isInstanceOf(IOException.class);
     }
 

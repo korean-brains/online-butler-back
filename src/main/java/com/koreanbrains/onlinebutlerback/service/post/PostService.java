@@ -5,9 +5,11 @@ import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.exception.PermissionDeniedException;
 import com.koreanbrains.onlinebutlerback.common.util.file.FileStore;
 import com.koreanbrains.onlinebutlerback.common.util.file.UploadFile;
+import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentRepository;
+import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
 import com.koreanbrains.onlinebutlerback.service.tag.TagService;
@@ -30,11 +32,16 @@ public class PostService {
     private final TagService tagService;
     private final FileStore fileStore;
     private final CommentRepository commentRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
-    public Long createPost(String caption, MultipartFile[] images, String[] tags) {
+    public Long createPost(String caption, MultipartFile[] images, String[] tags, Long writerId) {
+        Member member = memberRepository.findById(writerId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
         Post post = Post.builder()
                 .caption(caption)
+                .writer(member)
                 .build();
         Long postId = postRepository.save(post).getId();
 
@@ -61,7 +68,7 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.POST_NOT_FOUND));
 
-        if (!Objects.equals(post.getMemberId(), memberId)) {
+        if (!Objects.equals(post.getWriter().getId(), memberId)) {
             throw new PermissionDeniedException(ErrorCode.PERMISSION_DENIED);
         }
 
@@ -73,7 +80,7 @@ public class PostService {
     @Transactional
     public void deletePost(Long postId, Long memberId) {
         postRepository.findById(postId).ifPresent(post -> {
-            if(!Objects.equals(post.getMemberId(), memberId))
+            if(!Objects.equals(post.getWriter().getId(), memberId))
                 throw new PermissionDeniedException(ErrorCode.PERMISSION_DENIED);
 
             List<PostImage> postImages = postImageRepository.findByPostId(postId);
