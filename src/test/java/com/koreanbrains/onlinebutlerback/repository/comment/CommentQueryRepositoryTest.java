@@ -42,7 +42,7 @@ class CommentQueryRepositoryTest {
     @BeforeEach
     void setup() {
         Member member = memberRepository.save(Member.builder().name("kim").email("kim@gmail.com").isActive(true).build());
-        post = postRepository.save(Post.builder().caption("포스트 1").memberId(member.getId()).build());
+        post = postRepository.save(Post.builder().caption("포스트 1").writer(member).build());
         comments = commentRepository.saveAll(List.of(
                 Comment.builder().text("댓글 1").author(member).post(post).build(),
                 Comment.builder().text("댓글 2").author(member).post(post).build(),

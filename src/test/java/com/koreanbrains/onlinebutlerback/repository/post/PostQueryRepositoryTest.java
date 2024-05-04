@@ -47,6 +47,7 @@ class PostQueryRepositoryTest {
     @BeforeEach
     void setup() {
         em.createNativeQuery("ALTER TABLE post ALTER COLUMN id RESTART with 1").executeUpdate();
+        member = memberRepository.save(Member.builder().name("kim").email("kim@gmail.com").isActive(true).build());
 
         List<Tag> tags = tagRepository.saveAll(List.of(
                 Tag.builder().name("태그 1").build(),
@@ -54,16 +55,16 @@ class PostQueryRepositoryTest {
         ));
 
         List<Post> posts = postRepository.saveAll(List.of(
-                Post.builder().caption("포스트 1").memberId(1L).build(),
-                Post.builder().caption("포스트 2").memberId(1L).build(),
-                Post.builder().caption("포스트 3").memberId(1L).build(),
-                Post.builder().caption("포스트 4").memberId(1L).build(),
-                Post.builder().caption("포스트 5").memberId(1L).build(),
-                Post.builder().caption("포스트 6").memberId(1L).build(),
-                Post.builder().caption("포스트 7").memberId(1L).build(),
-                Post.builder().caption("포스트 8").memberId(1L).build(),
-                Post.builder().caption("포스트 9").memberId(1L).build(),
-                Post.builder().caption("포스트 10").memberId(1L).build()
+                Post.builder().caption("포스트 1").writer(member).build(),
+                Post.builder().caption("포스트 2").writer(member).build(),
+                Post.builder().caption("포스트 3").writer(member).build(),
+                Post.builder().caption("포스트 4").writer(member).build(),
+                Post.builder().caption("포스트 5").writer(member).build(),
+                Post.builder().caption("포스트 6").writer(member).build(),
+                Post.builder().caption("포스트 7").writer(member).build(),
+                Post.builder().caption("포스트 8").writer(member).build(),
+                Post.builder().caption("포스트 9").writer(member).build(),
+                Post.builder().caption("포스트 10").writer(member).build()
         ));
 
         for (Post post : posts) {
@@ -72,7 +73,6 @@ class PostQueryRepositoryTest {
             }
         }
 
-        member = memberRepository.save(Member.builder().name("kim").email("kim@gmail.com").isActive(true).build());
         for (Post post : posts) {
             likeRepository.save(Like.builder().post(post).member(member).build());
         }
