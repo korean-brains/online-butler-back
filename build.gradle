@@ -106,7 +106,8 @@ jacocoTestReport {
                             '**/common/util/p6spy/**',
                             '**/common/util/bootpay/**',
                             '**/common/util/file/**',
-                            '**/controller/file/**'
+                            '**/controller/file/**',
+                            '**/common/security/**'
                     ] + Qdomains)
                 })
         )
@@ -146,7 +147,8 @@ jacocoTestCoverageVerification {
                     '**.common.util.p6spy.**',
                     '**.common.util.bootpay.**',
                     '**.common.util.file.**',
-                    '**.controller.file.**'
+                    '**.controller.file.**',
+                    '**.common.security.**'
             ] + Qdomains
         }
     }
