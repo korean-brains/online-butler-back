@@ -6,7 +6,15 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-    //400
+    //401
+    UN_AUTHORIZE(401, "AUTH_001", "인증되지 않음"),
+    NO_AUTHORITIES_KEY(401, "JWT_001", "JWT에 권한 정보가 없습니다."),
+    INVALID_SIGNATURE(401, "JWT_002", "잘못된 JWT 서명입니다."),
+    EXPIRED_TOKEN(401, "JWT_003", "만료된 JWT 입니다."),
+    UNSUPPORTED_TOKEN(401, "JWT_004", "지원되지 않는 JWT 입니다."),
+    INVALID_TOKEN(401, "JWT_005", "JWT가 잘못되었습니다."),
+    NO_AUTHENTICATION_INFO(401, "JWT_006", "인증정보가 없습니다."),
+    INVALID_REFRESH_TOKEN(401, "JWT_007", "유효하지 않은 리프레시 토큰입니다."),
 
     //403
     PERMISSION_DENIED(403, "PM_001", "권한이 없습니다."),
