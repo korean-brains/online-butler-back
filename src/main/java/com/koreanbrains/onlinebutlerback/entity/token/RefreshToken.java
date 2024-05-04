@@ -1,6 +1,5 @@
 package com.koreanbrains.onlinebutlerback.entity.token;
 
-import com.koreanbrains.onlinebutlerback.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class RefreshToken extends BaseTimeEntity {
+public class RefreshToken {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
