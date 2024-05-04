@@ -1,4 +1,4 @@
-package com.koreanbrains.onlinebutlerback.common.dto;
+package com.koreanbrains.onlinebutlerback.common.security.dto;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

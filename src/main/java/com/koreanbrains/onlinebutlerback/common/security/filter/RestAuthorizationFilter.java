@@ -1,7 +1,7 @@
 package com.koreanbrains.onlinebutlerback.common.security.filter;
 
-import com.koreanbrains.onlinebutlerback.common.dto.AccountContext;
-import com.koreanbrains.onlinebutlerback.common.dto.AccountDto;
+import com.koreanbrains.onlinebutlerback.common.security.dto.AccountContext;
+import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
 import com.koreanbrains.onlinebutlerback.common.exception.BaseException;
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
@@ -44,7 +44,7 @@ public class RestAuthorizationFilter extends BasicAuthenticationFilter {
             long memberId = jwtProvider.getMemberIdFromAccessToken(accessToken);
             Member member = memberRepository.findById(memberId).orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-            AccountDto accountDto = com.koreanbrains.onlinebutlerback.common.dto.AccountDto.builder()
+            AccountDto accountDto = AccountDto.builder()
                     .id(member.getId())
                     .name(member.getName())
                     .email(member.getEmail())

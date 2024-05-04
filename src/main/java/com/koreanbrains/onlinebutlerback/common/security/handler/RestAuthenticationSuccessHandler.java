@@ -1,7 +1,7 @@
 package com.koreanbrains.onlinebutlerback.common.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.koreanbrains.onlinebutlerback.common.dto.AccountDto;
+import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
 import com.koreanbrains.onlinebutlerback.common.security.jwt.TokenDto;
 import com.koreanbrains.onlinebutlerback.common.security.jwt.JwtProvider;
 import com.koreanbrains.onlinebutlerback.common.security.service.RefreshTokenService;

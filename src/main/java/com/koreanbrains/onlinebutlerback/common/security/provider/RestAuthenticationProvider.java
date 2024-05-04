@@ -1,6 +1,6 @@
 package com.koreanbrains.onlinebutlerback.common.security.provider;
 
-import com.koreanbrains.onlinebutlerback.common.dto.AccountContext;
+import com.koreanbrains.onlinebutlerback.common.security.dto.AccountContext;
 import com.koreanbrains.onlinebutlerback.common.security.token.RestAuthenticationToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;

@@ -1,7 +1,7 @@
 package com.koreanbrains.onlinebutlerback.common.security.service;
 
-import com.koreanbrains.onlinebutlerback.common.dto.AccountContext;
-import com.koreanbrains.onlinebutlerback.common.dto.AccountDto;
+import com.koreanbrains.onlinebutlerback.common.security.dto.AccountContext;
+import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;

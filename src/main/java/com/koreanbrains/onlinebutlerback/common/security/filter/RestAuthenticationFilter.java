@@ -1,7 +1,7 @@
 package com.koreanbrains.onlinebutlerback.common.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.koreanbrains.onlinebutlerback.common.dto.AccountDto;
+import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
 import com.koreanbrains.onlinebutlerback.common.security.token.RestAuthenticationToken;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
