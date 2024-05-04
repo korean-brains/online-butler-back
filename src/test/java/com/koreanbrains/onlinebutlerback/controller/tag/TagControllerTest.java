@@ -40,7 +40,7 @@ class TagControllerTest {
                 .willReturn(tagScroll);
 
         // when
-        ResultActions result = mockMvc.perform(get("/tag")
+        ResultActions result = mockMvc.perform(get("/api/tag")
                 .param("cursor", "0")
                 .param("tag", "태그")
                 .param("size", "5"));

@@ -43,7 +43,7 @@ class CommentControllerTest {
         CommentWriteRequest request = new CommentWriteRequest(1L, "댓글 내용");
 
         // when
-        ResultActions result = mockMvc.perform(post("/comment")
+        ResultActions result = mockMvc.perform(post("/api/comment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(request)));
 
@@ -59,7 +59,7 @@ class CommentControllerTest {
         doNothing().when(commentService).deleteComment(anyLong(), anyLong());
 
         // when
-        ResultActions result = mockMvc.perform(delete("/comment/{commentId}", 1));
+        ResultActions result = mockMvc.perform(delete("/api/comment/{commentId}", 1));
 
         // then
         result.andExpect(status().isNoContent());
@@ -73,7 +73,7 @@ class CommentControllerTest {
         ReplyWriteRequest request = new ReplyWriteRequest("답글 내용");
 
         // when
-        ResultActions result = mockMvc.perform(post("/comment/{commentId}/reply", 1)
+        ResultActions result = mockMvc.perform(post("/api/comment/{commentId}/reply", 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(request)));
 
@@ -97,7 +97,7 @@ class CommentControllerTest {
                 .willReturn(new Scroll<>(content, 6L, null));
 
         // when
-        ResultActions result = mockMvc.perform(get("/comment/{commentId}/reply", 1)
+        ResultActions result = mockMvc.perform(get("/api/comment/{commentId}/reply", 1)
                 .param("cursor", "0")
                 .param("size", "5"));
 

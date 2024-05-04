@@ -45,7 +45,7 @@ class DonationControllerTest {
         DonationRequest donationRequest = new DonationRequest("66094df500be0400302256f1", 1L, 2L);
 
         // when
-        ResultActions result = mockMvc.perform(post("/donation/verify")
+        ResultActions result = mockMvc.perform(post("/api/donation/verify")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(donationRequest)));
 
@@ -77,7 +77,7 @@ class DonationControllerTest {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
         // when
-        ResultActions result = mockMvc.perform(get("/donation/give")
+        ResultActions result = mockMvc.perform(get("/api/donation/give")
                 .param("size", String.valueOf(request.getSize()))
                 .param("number", String.valueOf(request.getNumber()))
                 .param("start", request.getStart().format(dateTimeFormatter))
@@ -118,7 +118,7 @@ class DonationControllerTest {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
         // when
-        ResultActions result = mockMvc.perform(get("/donation/receive")
+        ResultActions result = mockMvc.perform(get("/api/donation/receive")
                 .param("size", String.valueOf(request.getSize()))
                 .param("number", String.valueOf(request.getNumber()))
                 .param("start", request.getStart().format(dateTimeFormatter))
