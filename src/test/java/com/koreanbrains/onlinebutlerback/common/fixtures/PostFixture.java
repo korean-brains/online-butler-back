@@ -6,7 +6,7 @@ public class PostFixture {
     public static Post post() {
         return Post.builder()
                 .id(1L)
-                .memberId(1L)
+                .writer(MemberFixture.member())
                 .caption("포스트 내용")
                 .build();
     }
@@ -14,7 +14,7 @@ public class PostFixture {
     public static Post post(Long postId, Long memberId) {
         return Post.builder()
                 .id(1L)
-                .memberId(1L)
+                .writer(MemberFixture.member(memberId))
                 .caption("포스트 내용")
                 .build();
     }

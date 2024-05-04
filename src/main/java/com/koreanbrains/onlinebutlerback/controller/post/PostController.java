@@ -36,8 +36,10 @@ public class PostController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("isAuthenticated()")
-    public Long createPost(@ModelAttribute PostCreateRequest request) {
-        return postService.createPost(request.caption(), request.images(), request.tags());
+    public Long createPost(@AuthenticationPrincipal AccountDto accountDto,
+                           @ModelAttribute PostCreateRequest request) {
+
+        return postService.createPost(request.caption(), request.images(), request.tags(), accountDto.getId());
     }
 
     @GetMapping("/{postId}")

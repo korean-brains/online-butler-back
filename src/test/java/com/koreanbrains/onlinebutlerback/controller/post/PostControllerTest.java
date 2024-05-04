@@ -54,7 +54,7 @@ class PostControllerTest extends ControllerTest {
     @WithRestMockUser
     void createPost() throws Exception {
         // given
-        given(postService.createPost(any(), any(), any())).willReturn(1L);
+        given(postService.createPost(any(), any(), any(), any())).willReturn(1L);
         MockMultipartFile images = new MockMultipartFile("images",
                 "cat.jpg",
                 MediaType.IMAGE_JPEG_VALUE,
