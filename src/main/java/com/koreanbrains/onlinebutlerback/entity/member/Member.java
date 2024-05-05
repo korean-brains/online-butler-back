@@ -1,6 +1,7 @@
 package com.koreanbrains.onlinebutlerback.entity.member;
 
 import com.koreanbrains.onlinebutlerback.common.entity.BaseTimeEntity;
+import com.koreanbrains.onlinebutlerback.common.entity.UploadedFile;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,11 +31,18 @@ public class Member extends BaseTimeEntity {
     @ColumnDefault("true")
     private boolean isActive = true;
 
+    @Embedded
+    private UploadedFile profileImage;
+
     public void updateName(String name) {
         this.name = name;
     }
 
     public void disableMember() {
         this.isActive = false;
+    }
+
+    public void updateProfileImage(UploadedFile profileImage) {
+        this.profileImage = profileImage;
     }
 }
