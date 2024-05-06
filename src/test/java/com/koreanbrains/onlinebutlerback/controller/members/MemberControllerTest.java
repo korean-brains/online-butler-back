@@ -6,9 +6,12 @@ import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundExceptio
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.fixtures.FileFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.MemberFixture;
+import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberDto;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
+import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
+import com.koreanbrains.onlinebutlerback.repository.post.PostScrollDto;
 import com.koreanbrains.onlinebutlerback.service.member.MemberService;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -34,6 +38,8 @@ class MemberControllerTest extends ControllerTest {
     MemberRepository memberRepository;
     @MockBean
     MemberQueryRepository memberQueryRepository;
+    @MockBean
+    PostQueryRepository postQueryRepository;
 
     @Test
     @DisplayName("멤버를 생성한다")
@@ -160,6 +166,35 @@ class MemberControllerTest extends ControllerTest {
 
         // then
         result.andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("특정 사용자가 작성한 게시글 목록을 조회한다.")
+    void scrollPostWriter() throws Exception {
+        // given
+        List<PostScrollDto> content = List.of(
+                new PostScrollDto(10L, "포스트 내용", List.of("고양이", "뚱냥이")),
+                new PostScrollDto(9L, "포스트 내용", List.of("고양이", "뚱냥이")),
+                new PostScrollDto(8L, "포스트 내용", List.of("고양이", "뚱냥이")),
+                new PostScrollDto(7L, "포스트 내용", List.of("고양이", "뚱냥이"))
+        );
+        given(postQueryRepository.scrollPost(anyLong(), anyInt(), anyLong()))
+                .willReturn(new Scroll<>(content, 6L, null));
+
+        // when
+        ResultActions result = mockMvc.perform(get("/api/member/{memberId}/post", 1)
+                .param("cursor", "11")
+                .param("size", "4")
+                .param("tagName", ""));
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.nextCursor").value(6))
+                .andExpect(jsonPath("$.nextSubCursor").isEmpty())
+                .andExpect(jsonPath("$.content.length()").value(4))
+                .andExpect(jsonPath("$.content[0].id").exists())
+                .andExpect(jsonPath("$.content[0].caption").exists())
+                .andExpect(jsonPath("$.content[0].tags").exists());
     }
 
 }

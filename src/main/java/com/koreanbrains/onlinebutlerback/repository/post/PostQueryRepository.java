@@ -26,7 +26,15 @@ public class PostQueryRepository {
         this.queryFactory = new JPAQueryFactory(JPQLTemplates.DEFAULT, em);
     }
 
+    public Scroll<PostScrollDto> scrollPost(Long cursor, int size, Long writerId) {
+        return scrollPost(cursor, null, size, writerId);
+    }
+
     public Scroll<PostScrollDto> scrollPost(Long cursor, String tagName, int size) {
+        return scrollPost(cursor, tagName, size, null);
+    }
+
+    public Scroll<PostScrollDto> scrollPost(Long cursor, String tagName, int size, Long writerId) {
         List<PostScrollDto> posts = queryFactory
                 .select(Projections.fields(PostScrollDto.class,
                         post.id,
@@ -34,7 +42,7 @@ public class PostQueryRepository {
                 .from(post)
                 .leftJoin(tagMapping).on(tagMapping.post.id.eq(post.id))
                 .leftJoin(tag).on(tag.id.eq(tagMapping.tag.id))
-                .where(postIdLoe(cursor), tagNameEq(tagName))
+                .where(postIdLoe(cursor), tagNameEq(tagName), writerIdEq(writerId))
                 .groupBy(post.id)
                 .orderBy(post.id.desc())
                 .limit(size + 1)
@@ -94,5 +102,9 @@ public class PostQueryRepository {
 
     private BooleanExpression tagNameEq(String tagName) {
         return StringUtils.hasText(tagName) ? tag.name.eq(tagName) : null;
+    }
+
+    private BooleanExpression writerIdEq(Long writerId) {
+        return writerId == null ? null : post.writer.id.eq(writerId);
     }
 }

@@ -2,9 +2,13 @@ package com.koreanbrains.onlinebutlerback.controller.members;
 
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
+import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
+import com.koreanbrains.onlinebutlerback.controller.post.PostScrollRequest;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberDto;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberQueryRepository;
+import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
+import com.koreanbrains.onlinebutlerback.repository.post.PostScrollDto;
 import com.koreanbrains.onlinebutlerback.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +23,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MemberQueryRepository memberQueryRepository;
+    private final PostQueryRepository postQueryRepository;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -59,6 +64,13 @@ public class MemberController {
     public MemberDto getMe(@AuthenticationPrincipal AccountDto accountDto) {
         return memberQueryRepository.findById(accountDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    @GetMapping("/{memberId}/post")
+    public Scroll<PostScrollDto> scrollWrittenPost(@PathVariable("memberId") Long memberId,
+                                                   @ModelAttribute PostScrollRequest request) {
+
+        return postQueryRepository.scrollPost(request.cursor(), request.size(), memberId);
     }
 
 }
