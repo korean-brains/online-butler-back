@@ -146,6 +146,28 @@ class PostQueryRepositoryTest {
     }
 
     @Test
+    @DisplayName("특정 사용자가 작성한 포스트 목록을 무한스크롤로 조회한다")
+    void scrollPostWriter() {
+        // given
+        Long cursor = null;
+        Long writerId = member.getId();
+        int size = 5;
+
+        // when
+        Scroll<PostScrollDto> result = postQueryRepository.scrollPost(cursor, size, writerId);
+
+        // then
+        assertThat(result.getNextCursor()).isEqualTo(5L);
+        assertThat(result.getNextSubCursor()).isNull();
+        assertThat(result.getContent().size()).isEqualTo(size);
+        assertThat(result.getContent().get(0).getCaption()).isEqualTo("포스트 10");
+        assertThat(result.getContent().get(1).getCaption()).isEqualTo("포스트 9");
+        assertThat(result.getContent().get(2).getCaption()).isEqualTo("포스트 8");
+        assertThat(result.getContent().get(3).getCaption()).isEqualTo("포스트 7");
+        assertThat(result.getContent().get(4).getCaption()).isEqualTo("포스트 6");
+    }
+
+    @Test
     @DisplayName("좋아요한 게시글 목록을 무한스크롤로 조회한다")
     void scrollLikePost() {
         // given
