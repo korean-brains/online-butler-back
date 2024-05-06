@@ -1,5 +1,6 @@
 package com.koreanbrains.onlinebutlerback.common.fixtures;
 
+import com.koreanbrains.onlinebutlerback.common.entity.UploadedFile;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 
 public class MemberFixture {
@@ -11,7 +12,6 @@ public class MemberFixture {
                 .password("asdfasdf")
                 .build();
     }
-
     public static Member member(Long id) {
         return Member.builder()
                 .id(id)
@@ -27,6 +27,16 @@ public class MemberFixture {
                 .name(name)
                 .email(name + "@gmail.com")
                 .password("asdfasdf")
+                .build();
+    }
+
+    public static Member memberWithProfileImage() {
+        return Member.builder()
+                .id(1L)
+                .name("kim")
+                .email("kim@gmail.com")
+                .password("asdfasdf")
+                .profileImage(new UploadedFile("image.jpg", "image.jpg", "assets/image.jpg"))
                 .build();
     }
 }

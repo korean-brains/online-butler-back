@@ -1,20 +1,20 @@
 package com.koreanbrains.onlinebutlerback.controller.members;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.koreanbrains.onlinebutlerback.common.ControllerTest;
+import com.koreanbrains.onlinebutlerback.common.context.WithRestMockUser;
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
+import com.koreanbrains.onlinebutlerback.common.fixtures.FileFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.MemberFixture;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import com.koreanbrains.onlinebutlerback.service.member.MemberService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -22,18 +22,13 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = MemberController.class,
-        excludeAutoConfiguration = SecurityAutoConfiguration.class)
-class MemberControllerTest {
+@WebMvcTest(controllers = MemberController.class)
+class MemberControllerTest extends ControllerTest {
 
     @MockBean
     MemberService memberService;
     @MockBean
     MemberRepository memberRepository;
-    @Autowired
-    MockMvc mockMvc;
-
-    ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     @DisplayName("멤버를 생성한다")
@@ -111,5 +106,21 @@ class MemberControllerTest {
         // then
         result.andExpect(status().isNoContent())
                 .andExpect(content().string("1"));
+    }
+
+    @Test
+    @DisplayName("프로필 이미지를 변경한다")
+    @WithRestMockUser
+    void updateProfileImage() throws Exception {
+        // given
+        MockMultipartFile image = FileFixture.multipartImage("profileImage");
+        given(memberService.updateProfileImage(anyLong(), any())).willReturn("assets/image.jpg");
+
+        // when
+        ResultActions result = mockMvc.perform(multipart("/api/member/me/profile-image")
+                .file(image));
+
+        // then
+        result.andExpect(status().isOk());
     }
 }

@@ -1,9 +1,12 @@
 package com.koreanbrains.onlinebutlerback.controller.members;
 
+import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,4 +41,14 @@ public class MemberController {
     public Long disableMember(@PathVariable("member-id") Long memberId){
         return memberService.disableMember(memberId);
     }
+
+    @PostMapping("/me/profile-image")
+    @PreAuthorize("isAuthenticated()")
+    public ProfileImageUpdateResponse updateProfileImage(@AuthenticationPrincipal AccountDto accountDto,
+                                                         @ModelAttribute ProfileImageUpdateRequest request) {
+
+        String profileImageUrl = memberService.updateProfileImage(accountDto.getId(), request.profileImage());
+        return new ProfileImageUpdateResponse(profileImageUrl);
+    }
+
 }
