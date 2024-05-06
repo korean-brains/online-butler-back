@@ -1,7 +1,10 @@
 package com.koreanbrains.onlinebutlerback.controller.members;
 
+import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
+import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
-import com.koreanbrains.onlinebutlerback.entity.member.Member;
+import com.koreanbrains.onlinebutlerback.repository.member.MemberDto;
+import com.koreanbrains.onlinebutlerback.repository.member.MemberQueryRepository;
 import com.koreanbrains.onlinebutlerback.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberQueryRepository memberQueryRepository;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -23,10 +27,9 @@ public class MemberController {
     }
 
     @GetMapping("/{member-id}")
-    public MemberGetResponse getMember(@PathVariable("member-id") Long memberId){
-        Member findMember = memberService.getMember(memberId);
-
-        return new MemberGetResponse(findMember);
+    public MemberDto getMember(@PathVariable("member-id") Long memberId){
+        return memberQueryRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     @PatchMapping("/{member-id}")
@@ -49,6 +52,13 @@ public class MemberController {
 
         String profileImageUrl = memberService.updateProfileImage(accountDto.getId(), request.profileImage());
         return new ProfileImageUpdateResponse(profileImageUrl);
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public MemberDto getMe(@AuthenticationPrincipal AccountDto accountDto) {
+        return memberQueryRepository.findById(accountDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
 }

@@ -78,6 +78,26 @@ class PostServiceTest {
         // then
         assertThat(postId).isEqualTo(1L);
     }
+
+    @Test
+    @DisplayName("포스트 생성시 작성자가 존재하지 않으면 예외가 발생한다.")
+    void createPostFailNotFoundWriter() {
+        // given
+        String caption = "포스트 내용";
+        MockMultipartFile[] images = {
+                new MockMultipartFile("images",
+                        "cat.jpg",
+                        MediaType.IMAGE_PNG_VALUE,
+                        "<<image>>".getBytes())};
+        String[] tags = {"고양이", "뚱냥이"};
+
+        given(memberRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        // when
+        // then
+        assertThatThrownBy(() -> postService.createPost(caption, images, tags, 1L))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
     
     @Test
     @DisplayName("이미지가 업로드 되지 않으면 예외가 발생한다")
