@@ -42,7 +42,7 @@ public class MemberController {
         return memberService.disableMember(memberId);
     }
 
-    @PutMapping("/me/profile-image")
+    @PostMapping("/me/profile-image")
     @PreAuthorize("isAuthenticated()")
     public ProfileImageUpdateResponse updateProfileImage(@AuthenticationPrincipal AccountDto accountDto,
                                                          @ModelAttribute ProfileImageUpdateRequest request) {
