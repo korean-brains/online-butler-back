@@ -2,6 +2,7 @@ package com.koreanbrains.onlinebutlerback.common.fixtures;
 
 import com.koreanbrains.onlinebutlerback.common.entity.UploadedFile;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
+import com.koreanbrains.onlinebutlerback.repository.member.MemberDto;
 
 public class MemberFixture {
     public static Member member() {
@@ -38,5 +39,9 @@ public class MemberFixture {
                 .password("asdfasdf")
                 .profileImage(new UploadedFile("image.jpg", "image.jpg", "assets/image.jpg"))
                 .build();
+    }
+
+    public static MemberDto memberDto() {
+        return new MemberDto(1L, "kim", "kim@gmail.com", "assets/image.jpg", 10, 10, 10);
     }
 }

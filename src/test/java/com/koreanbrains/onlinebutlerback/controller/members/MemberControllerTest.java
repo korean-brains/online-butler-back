@@ -6,7 +6,8 @@ import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundExceptio
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.fixtures.FileFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.MemberFixture;
-import com.koreanbrains.onlinebutlerback.entity.member.Member;
+import com.koreanbrains.onlinebutlerback.repository.member.MemberDto;
+import com.koreanbrains.onlinebutlerback.repository.member.MemberQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import com.koreanbrains.onlinebutlerback.service.member.MemberService;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -16,6 +17,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.ResultActions;
+
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -29,6 +32,8 @@ class MemberControllerTest extends ControllerTest {
     MemberService memberService;
     @MockBean
     MemberRepository memberRepository;
+    @MockBean
+    MemberQueryRepository memberQueryRepository;
 
     @Test
     @DisplayName("멤버를 생성한다")
@@ -51,17 +56,21 @@ class MemberControllerTest extends ControllerTest {
     @DisplayName("멤버를 조회한다")
     void getMember() throws Exception {
         // given
-        Member member = MemberFixture.member();
-        given(memberService.getMember(anyLong())).willReturn(member);
+        MemberDto member = MemberFixture.memberDto();
+        given(memberQueryRepository.findById(anyLong())).willReturn(Optional.of(member));
 
         // when
         ResultActions result = mockMvc.perform(get("/api/member/{memberId}", 1));
 
         // then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(member.getId()))
-                .andExpect(jsonPath("$.name").value(member.getName()))
-                .andExpect(jsonPath("$.email").value(member.getEmail()));
+                .andExpect(jsonPath("$.id").value(member.id()))
+                .andExpect(jsonPath("$.name").value(member.name()))
+                .andExpect(jsonPath("$.email").value(member.email()))
+                .andExpect(jsonPath("$.profileImage").value(member.profileImage()))
+                .andExpect(jsonPath("$.postCount").value(member.postCount()))
+                .andExpect(jsonPath("$.followerCount").value(member.followerCount()))
+                .andExpect(jsonPath("$.followingCount").value(member.followingCount()));
     }
 
     @Test
@@ -123,4 +132,34 @@ class MemberControllerTest extends ControllerTest {
         // then
         result.andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("내 정보를 조회한다")
+    @WithRestMockUser
+    void findMe() throws Exception {
+        // given
+        MemberDto memberDto = MemberFixture.memberDto();
+        given(memberQueryRepository.findById(anyLong())).willReturn(Optional.of(memberDto));
+
+        // when
+        ResultActions result = mockMvc.perform(get("/api/member/me"));
+
+        // then
+        result.andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("내 정보가 조회되지 않으면 404를 반환한다.")
+    @WithRestMockUser
+    void findMeFailNotFound() throws Exception {
+        // given
+        given(memberQueryRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        // when
+        ResultActions result = mockMvc.perform(get("/api/member/me"));
+
+        // then
+        result.andExpect(status().isNotFound());
+    }
+
 }
