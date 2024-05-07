@@ -4,6 +4,7 @@ import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.entity.like.Like;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
+import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
 import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
 import com.koreanbrains.onlinebutlerback.repository.like.LikeRepository;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -40,9 +42,12 @@ class PostQueryRepositoryTest {
     @Autowired
     MemberRepository memberRepository;
     @Autowired
+    PostImageRepository postImageRepository;
+    @Autowired
     EntityManager em;
 
     Member member;
+    List<Post> posts;
 
     @BeforeEach
     void setup() {
@@ -54,7 +59,7 @@ class PostQueryRepositoryTest {
                 Tag.builder().name("태그 2").build()
         ));
 
-        List<Post> posts = postRepository.saveAll(List.of(
+        posts = postRepository.saveAll(List.of(
                 Post.builder().caption("포스트 1").writer(member).build(),
                 Post.builder().caption("포스트 2").writer(member).build(),
                 Post.builder().caption("포스트 3").writer(member).build(),
@@ -71,10 +76,8 @@ class PostQueryRepositoryTest {
             for (Tag tag : tags) {
                 tagMappingRepository.save(TagMapping.builder().tag(tag).post(post).build());
             }
-        }
-
-        for (Post post : posts) {
             likeRepository.save(Like.builder().post(post).member(member).build());
+            postImageRepository.save(PostImage.builder().post(post).originalName("image.jpg").storedName("image.jpg").url("/assets/image.jpg").build());
         }
     }
 
@@ -176,17 +179,17 @@ class PostQueryRepositoryTest {
         int size = 5;
 
         // when
-        Scroll<LikePostScrollDto> result = postQueryRepository.scrollLikePost(cursor, memberId, size);
+        Scroll<PostScrollDto> result = postQueryRepository.scrollLikePost(cursor, memberId, size);
 
         // then
         assertThat(result.getNextCursor()).isEqualTo(5L);
         assertThat(result.getNextSubCursor()).isNull();
         assertThat(result.getContent().size()).isEqualTo(size);
-        assertThat(result.getContent().get(0).caption()).isEqualTo("포스트 10");
-        assertThat(result.getContent().get(1).caption()).isEqualTo("포스트 9");
-        assertThat(result.getContent().get(2).caption()).isEqualTo("포스트 8");
-        assertThat(result.getContent().get(3).caption()).isEqualTo("포스트 7");
-        assertThat(result.getContent().get(4).caption()).isEqualTo("포스트 6");
+        assertThat(result.getContent().get(0).getCaption()).isEqualTo("포스트 10");
+        assertThat(result.getContent().get(1).getCaption()).isEqualTo("포스트 9");
+        assertThat(result.getContent().get(2).getCaption()).isEqualTo("포스트 8");
+        assertThat(result.getContent().get(3).getCaption()).isEqualTo("포스트 7");
+        assertThat(result.getContent().get(4).getCaption()).isEqualTo("포스트 6");
     }
 
     @Test
@@ -198,17 +201,45 @@ class PostQueryRepositoryTest {
         int size = 5;
 
         // when
-        Scroll<LikePostScrollDto> result = postQueryRepository.scrollLikePost(cursor, memberId, size);
+        Scroll<PostScrollDto> result = postQueryRepository.scrollLikePost(cursor, memberId, size);
 
         // then
         assertThat(result.getNextCursor()).isNull();
         assertThat(result.getNextSubCursor()).isNull();
         assertThat(result.getContent().size()).isEqualTo(size);
-        assertThat(result.getContent().get(0).caption()).isEqualTo("포스트 5");
-        assertThat(result.getContent().get(1).caption()).isEqualTo("포스트 4");
-        assertThat(result.getContent().get(2).caption()).isEqualTo("포스트 3");
-        assertThat(result.getContent().get(3).caption()).isEqualTo("포스트 2");
-        assertThat(result.getContent().get(4).caption()).isEqualTo("포스트 1");
+        assertThat(result.getContent().get(0).getCaption()).isEqualTo("포스트 5");
+        assertThat(result.getContent().get(1).getCaption()).isEqualTo("포스트 4");
+        assertThat(result.getContent().get(2).getCaption()).isEqualTo("포스트 3");
+        assertThat(result.getContent().get(3).getCaption()).isEqualTo("포스트 2");
+        assertThat(result.getContent().get(4).getCaption()).isEqualTo("포스트 1");
+    }
+
+    @Test
+    @DisplayName("게시글을 단건 조회한다")
+    void findById() {
+        // given
+        Post post = posts.get(0);
+        Long postId = post.getId();
+
+        // when
+        Optional<PostDto> postDto = postQueryRepository.findById(postId);
+
+        // then
+        assertThat(postDto.isPresent()).isTrue();
+        assertThat(postDto.get().getId()).isEqualTo(post.getId());
+    }
+
+    @Test
+    @DisplayName("게시글을 단건 조회 결과가 없으면 Optional.empty()를 반환한다")
+    void findByIdEmpty() {
+        // given
+        Long postId = 0L;
+
+        // when
+        Optional<PostDto> postDto = postQueryRepository.findById(postId);
+
+        // then
+        assertThat(postDto.isPresent()).isFalse();
     }
 
 

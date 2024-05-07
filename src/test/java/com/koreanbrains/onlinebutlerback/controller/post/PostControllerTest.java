@@ -3,14 +3,7 @@ package com.koreanbrains.onlinebutlerback.controller.post;
 import com.koreanbrains.onlinebutlerback.common.ControllerTest;
 import com.koreanbrains.onlinebutlerback.common.context.WithRestMockUser;
 import com.koreanbrains.onlinebutlerback.common.fixtures.PostFixture;
-import com.koreanbrains.onlinebutlerback.common.fixtures.PostImageFixture;
-import com.koreanbrains.onlinebutlerback.common.fixtures.TagFixture;
-import com.koreanbrains.onlinebutlerback.common.fixtures.TagMappingFixture;
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
-import com.koreanbrains.onlinebutlerback.entity.post.Post;
-import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
-import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
-import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentScrollDto;
 import com.koreanbrains.onlinebutlerback.repository.post.*;
@@ -75,30 +68,18 @@ class PostControllerTest extends ControllerTest {
     @DisplayName("포스트를 조회한다")
     void getPost() throws Exception {
         // given
-        Post post = PostFixture.post();
-        List<PostImage> postImages = List.of(
-                PostImageFixture.postImage(1L, post),
-                PostImageFixture.postImage(2L, post),
-                PostImageFixture.postImage(3L, post)
-        );
-        Tag tag = TagFixture.tag();
-        TagMapping tagMapping = TagMappingFixture.tagMapping(post, tag);
-        given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
-        given(postImageRepository.findByPostId(anyLong())).willReturn(postImages);
-        given(tagMappingRepository.findAllByPost(any())).willReturn(List.of(tagMapping));
-
+        PostDto postDto = PostFixture.postDto();
+        given(postQueryRepository.findById(anyLong())).willReturn(Optional.of(postDto));
 
         // when
         ResultActions result = mockMvc.perform(get("/api/post/{postId}", 1));
 
         // then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(post.getId()))
-                .andExpect(jsonPath("$.caption").value(post.getCaption()))
-                .andExpect(jsonPath("$.images[0]").value(postImages.get(0).getUrl()))
-                .andExpect(jsonPath("$.images[1]").value(postImages.get(1).getUrl()))
-                .andExpect(jsonPath("$.images[2]").value(postImages.get(2).getUrl()))
-                .andExpect(jsonPath("$.tags[0]").value(tag.getName()));
+                .andExpect(jsonPath("$.id").value(postDto.getId()))
+                .andExpect(jsonPath("$.caption").value(postDto.getCaption()))
+                .andExpect(jsonPath("$.images[0]").value(postDto.getImages().get(0)))
+                .andExpect(jsonPath("$.tags[0]").value(postDto.getTags().get(0)));
     }
 
     @Test
@@ -149,12 +130,7 @@ class PostControllerTest extends ControllerTest {
     @DisplayName("포스트 목록을 무한스크롤로 조회한다")
     void scrollPost() throws Exception {
         // given
-        List<PostScrollDto> content = List.of(
-                new PostScrollDto(10L, "포스트 내용", List.of("고양이", "뚱냥이")),
-                new PostScrollDto(9L, "포스트 내용", List.of("고양이", "뚱냥이")),
-                new PostScrollDto(8L, "포스트 내용", List.of("고양이", "뚱냥이")),
-                new PostScrollDto(7L, "포스트 내용", List.of("고양이", "뚱냥이"))
-        );
+        List<PostScrollDto> content = PostFixture.scrollPost(10L, 7L);
         given(postQueryRepository.scrollPost(anyLong(), anyString(), anyInt()))
                 .willReturn(new Scroll<>(content, 6L, null));
 
@@ -209,12 +185,7 @@ class PostControllerTest extends ControllerTest {
     @WithRestMockUser
     void scrollLikePost() throws Exception {
         // given
-        List<LikePostScrollDto> content = List.of(
-                new LikePostScrollDto(10L, "포스트 내용"),
-                new LikePostScrollDto(9L, "포스트 내용"),
-                new LikePostScrollDto(8L, "포스트 내용"),
-                new LikePostScrollDto(7L, "포스트 내용")
-        );
+        List<PostScrollDto> content = PostFixture.scrollPost(10L, 7L);
         given(postQueryRepository.scrollLikePost(anyLong(), anyLong(), anyInt()))
                 .willReturn(new Scroll<>(content, 6L, null));
 

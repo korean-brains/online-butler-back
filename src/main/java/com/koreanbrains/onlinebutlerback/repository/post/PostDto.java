@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostScrollDto {
+public class PostDto {
 
     private Long id;
     private String caption;
@@ -23,22 +23,6 @@ public class PostScrollDto {
     private List<String> tags = new ArrayList<>();
     private List<String> images = new ArrayList<>();
 
-    public PostScrollDto(Long id, String caption, LocalDateTime createdAt, long likeCount, long commentCount, Writer writer) {
-        this.id = id;
-        this.caption = caption;
-        this.createdAt = createdAt;
-        this.likeCount = likeCount;
-        this.commentCount = commentCount;
-        this.writer = writer;
-    }
-
-    public void addTag(String tag) {
-        this.tags.add(tag);
-    }
-    public void addImage(String image) {
-        this.images.add(image);
-    }
-
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -47,5 +31,9 @@ public class PostScrollDto {
         private String name;
         private String profile;
         private boolean followed;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 }
