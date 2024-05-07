@@ -1,11 +1,9 @@
 package com.koreanbrains.onlinebutlerback.repository.post;
 
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
-import com.koreanbrains.onlinebutlerback.entity.comment.QComment;
-import com.koreanbrains.onlinebutlerback.entity.member.QMember;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
-import com.koreanbrains.onlinebutlerback.entity.post.QPostImage;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -17,7 +15,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.koreanbrains.onlinebutlerback.entity.comment.QComment.*;
 import static com.koreanbrains.onlinebutlerback.entity.like.QLike.*;
@@ -114,6 +114,47 @@ public class PostQueryRepository {
         }
 
         return new Scroll<>(posts, nextCursor, null);
+    }
+
+    public Optional<PostDto> findById(Long postId) {
+        Map<Long, PostDto> result = queryFactory
+                .from(post)
+                .join(post.writer, member)
+                .leftJoin(tagMapping).on(tagMapping.post.id.eq(post.id))
+                .leftJoin(tag).on(tag.id.eq(tagMapping.tag.id))
+                .where(post.id.eq(postId))
+                .transform(GroupBy.groupBy(post.id).as(
+                        Projections.fields(PostDto.class,
+                                post.id,
+                                post.caption,
+                                post.createdAt,
+                                Expressions.as(JPAExpressions.select(like.count())
+                                        .from(like)
+                                        .where(like.post.eq(post)), "likeCount"),
+                                Expressions.as(JPAExpressions.select(comment.count())
+                                        .from(comment)
+                                        .where(comment.post.eq(post)), "commentCount"),
+                                Expressions.as(Projections.constructor(PostDto.Writer.class,
+                                        member.id,
+                                        member.name,
+                                        member.profileImage.url,
+                                        Expressions.constant(false)
+                                ), "writer"),
+                                GroupBy.list(tag.name).as("tags")
+                        )));
+
+        if(result.isEmpty()) return Optional.empty();
+        PostDto postDto = result.get(postId);
+
+        List<String> postImages = queryFactory
+                .select(postImage.url)
+                .from(postImage)
+                .where(postImage.post.id.eq(postId))
+                .fetch();
+
+        postDto.setImages(postImages);
+
+        return Optional.of(result.get(postId));
     }
 
     private BooleanExpression postIdLoe(Long id) {

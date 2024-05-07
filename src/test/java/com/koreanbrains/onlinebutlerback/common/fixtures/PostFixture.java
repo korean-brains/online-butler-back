@@ -1,6 +1,7 @@
 package com.koreanbrains.onlinebutlerback.common.fixtures;
 
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
+import com.koreanbrains.onlinebutlerback.repository.post.PostDto;
 import com.koreanbrains.onlinebutlerback.repository.post.PostScrollDto;
 
 import java.time.LocalDateTime;
@@ -45,5 +46,18 @@ public class PostFixture {
         }
 
         return posts;
+    }
+
+    public static PostDto postDto() {
+        return new PostDto(
+                1L,
+                "포스트 내용",
+                LocalDateTime.of(2024, 4, 1, 12, 0, 0),
+                0,
+                0,
+                new PostDto.Writer(1L, "홍길동", "assets/image.jpg", false),
+                List.of("태그1", "태그2"),
+                List.of("assets/image1.jpg", "assets/image2.jpg")
+        );
     }
 }

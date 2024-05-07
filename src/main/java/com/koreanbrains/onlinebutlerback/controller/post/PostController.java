@@ -4,14 +4,9 @@ import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundExceptio
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
-import com.koreanbrains.onlinebutlerback.entity.post.Post;
-import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
-import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
-import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentScrollDto;
 import com.koreanbrains.onlinebutlerback.repository.post.*;
-import com.koreanbrains.onlinebutlerback.repository.tag.TagMappingRepository;
 import com.koreanbrains.onlinebutlerback.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/post")
@@ -27,9 +21,6 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
-    private final PostRepository postRepository;
-    private final PostImageRepository postImageRepository;
-    private final TagMappingRepository tagMappingRepository;
     private final PostQueryRepository postQueryRepository;
     private final CommentQueryRepository commentQueryRepository;
 
@@ -43,15 +34,9 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public PostGetResponse getPost(@PathVariable("postId") Long postId) {
-        Post post = postRepository.findById(postId)
+    public PostDto getPost(@PathVariable("postId") Long postId) {
+        return postQueryRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.POST_NOT_FOUND));
-        List<PostImage> postImages = postImageRepository.findByPostId(postId);
-        List<Tag> tags = tagMappingRepository.findAllByPost(post).stream()
-                .map(TagMapping::getTag)
-                .toList();
-
-        return new PostGetResponse(post, postImages, tags);
     }
 
     @PatchMapping("/{postId}")

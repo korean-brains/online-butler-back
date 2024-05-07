@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -46,6 +47,7 @@ class PostQueryRepositoryTest {
     EntityManager em;
 
     Member member;
+    List<Post> posts;
 
     @BeforeEach
     void setup() {
@@ -57,7 +59,7 @@ class PostQueryRepositoryTest {
                 Tag.builder().name("태그 2").build()
         ));
 
-        List<Post> posts = postRepository.saveAll(List.of(
+        posts = postRepository.saveAll(List.of(
                 Post.builder().caption("포스트 1").writer(member).build(),
                 Post.builder().caption("포스트 2").writer(member).build(),
                 Post.builder().caption("포스트 3").writer(member).build(),
@@ -210,6 +212,34 @@ class PostQueryRepositoryTest {
         assertThat(result.getContent().get(2).getCaption()).isEqualTo("포스트 3");
         assertThat(result.getContent().get(3).getCaption()).isEqualTo("포스트 2");
         assertThat(result.getContent().get(4).getCaption()).isEqualTo("포스트 1");
+    }
+
+    @Test
+    @DisplayName("게시글을 단건 조회한다")
+    void findById() {
+        // given
+        Post post = posts.get(0);
+        Long postId = post.getId();
+
+        // when
+        Optional<PostDto> postDto = postQueryRepository.findById(postId);
+
+        // then
+        assertThat(postDto.isPresent()).isTrue();
+        assertThat(postDto.get().getId()).isEqualTo(post.getId());
+    }
+
+    @Test
+    @DisplayName("게시글을 단건 조회 결과가 없으면 Optional.empty()를 반환한다")
+    void findByIdEmpty() {
+        // given
+        Long postId = 0L;
+
+        // when
+        Optional<PostDto> postDto = postQueryRepository.findById(postId);
+
+        // then
+        assertThat(postDto.isPresent()).isFalse();
     }
 
 
