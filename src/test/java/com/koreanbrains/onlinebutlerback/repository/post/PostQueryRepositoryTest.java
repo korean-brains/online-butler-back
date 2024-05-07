@@ -4,6 +4,7 @@ import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.entity.like.Like;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
+import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
 import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
 import com.koreanbrains.onlinebutlerback.entity.tag.TagMapping;
 import com.koreanbrains.onlinebutlerback.repository.like.LikeRepository;
@@ -40,6 +41,8 @@ class PostQueryRepositoryTest {
     @Autowired
     MemberRepository memberRepository;
     @Autowired
+    PostImageRepository postImageRepository;
+    @Autowired
     EntityManager em;
 
     Member member;
@@ -71,10 +74,8 @@ class PostQueryRepositoryTest {
             for (Tag tag : tags) {
                 tagMappingRepository.save(TagMapping.builder().tag(tag).post(post).build());
             }
-        }
-
-        for (Post post : posts) {
             likeRepository.save(Like.builder().post(post).member(member).build());
+            postImageRepository.save(PostImage.builder().post(post).originalName("image.jpg").storedName("image.jpg").url("/assets/image.jpg").build());
         }
     }
 
