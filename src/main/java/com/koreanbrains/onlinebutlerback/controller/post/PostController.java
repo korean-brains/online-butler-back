@@ -85,7 +85,7 @@ public class PostController {
 
     @GetMapping("/like")
     @PreAuthorize("isAuthenticated()")
-    public Scroll<LikePostScrollDto> scrollLikePost(@AuthenticationPrincipal AccountDto accountDto,
+    public Scroll<PostScrollDto> scrollLikePost(@AuthenticationPrincipal AccountDto accountDto,
                                                     @ModelAttribute LikePostScrollRequest request) {
 
         return postQueryRepository.scrollLikePost(request.cursor(), accountDto.getId(), request.size());

@@ -1,9 +1,15 @@
 package com.koreanbrains.onlinebutlerback.repository.post;
 
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
+import com.koreanbrains.onlinebutlerback.entity.comment.QComment;
+import com.koreanbrains.onlinebutlerback.entity.member.QMember;
+import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
+import com.koreanbrains.onlinebutlerback.entity.post.QPostImage;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -13,8 +19,11 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Objects;
 
+import static com.koreanbrains.onlinebutlerback.entity.comment.QComment.*;
 import static com.koreanbrains.onlinebutlerback.entity.like.QLike.*;
+import static com.koreanbrains.onlinebutlerback.entity.member.QMember.*;
 import static com.koreanbrains.onlinebutlerback.entity.post.QPost.*;
+import static com.koreanbrains.onlinebutlerback.entity.post.QPostImage.*;
 import static com.koreanbrains.onlinebutlerback.entity.tag.QTag.*;
 import static com.koreanbrains.onlinebutlerback.entity.tag.QTagMapping.*;
 
@@ -27,22 +36,42 @@ public class PostQueryRepository {
     }
 
     public Scroll<PostScrollDto> scrollPost(Long cursor, int size, Long writerId) {
-        return scrollPost(cursor, null, size, writerId);
+        return scrollPost(cursor, null, size, writerId, null);
     }
 
     public Scroll<PostScrollDto> scrollPost(Long cursor, String tagName, int size) {
-        return scrollPost(cursor, tagName, size, null);
+        return scrollPost(cursor, tagName, size, null, null);
     }
 
-    public Scroll<PostScrollDto> scrollPost(Long cursor, String tagName, int size, Long writerId) {
+    public Scroll<PostScrollDto> scrollLikePost(Long cursor, Long memberId, int size) {
+        return scrollPost(cursor, null, size, null, memberId);
+    }
+
+    public Scroll<PostScrollDto> scrollPost(Long cursor, String tagName, int size, Long writerId, Long likeMemberId) {
         List<PostScrollDto> posts = queryFactory
-                .select(Projections.fields(PostScrollDto.class,
+                .select(Projections.constructor(PostScrollDto.class,
                         post.id,
-                        post.caption))
+                        post.caption,
+                        post.createdAt,
+                        JPAExpressions.select(like.count())
+                                .from(like)
+                                .where(like.post.eq(post)),
+                        JPAExpressions.select(comment.count())
+                                .from(comment)
+                                .where(comment.post.eq(post)),
+                        Projections.constructor(PostScrollDto.Writer.class,
+                                member.id,
+                                member.name,
+                                member.profileImage.url,
+                                Expressions.constant(false)
+                        )
+                ))
                 .from(post)
+                .join(post.writer, member)
                 .leftJoin(tagMapping).on(tagMapping.post.id.eq(post.id))
                 .leftJoin(tag).on(tag.id.eq(tagMapping.tag.id))
-                .where(postIdLoe(cursor), tagNameEq(tagName), writerIdEq(writerId))
+                .leftJoin(like).on(like.post.id.eq(post.id))
+                .where(postIdLoe(cursor), tagNameEq(tagName), writerIdEq(writerId), likeMemberIdEq(likeMemberId))
                 .groupBy(post.id)
                 .orderBy(post.id.desc())
                 .limit(size + 1)
@@ -59,37 +88,28 @@ public class PostQueryRepository {
                 .where(tagMapping.post.id.in(postIds))
                 .fetch();
 
+
+        List<PostImage> postImages = queryFactory
+                .select(postImage)
+                .from(postImage)
+                .where(postImage.post.id.in(postIds))
+                .fetch();
+
         for (Tuple t : tags) {
             posts.stream()
                     .filter(p -> Objects.equals(p.getId(), t.get(post.id)))
                     .findFirst()
                     .ifPresent(p -> p.addTag(t.get(tag.name)));
         }
+        postImages.forEach(image -> posts.stream()
+                .filter(p -> Objects.equals(p.getId(), image.getPost().getId()))
+                .findFirst()
+                .ifPresent(p -> p.addImage(image.getUrl()))
+        );
 
         Long nextCursor = null;
-        if(posts.size() > size) {
+        if (posts.size() > size) {
             nextCursor = posts.get(posts.size() - 1).getId();
-            posts.remove(posts.size() - 1);
-        }
-
-        return new Scroll<>(posts, nextCursor, null);
-    }
-
-    public Scroll<LikePostScrollDto> scrollLikePost(Long cursor, Long memberId, int size) {
-        List<LikePostScrollDto> posts = queryFactory
-                .select(Projections.constructor(LikePostScrollDto.class,
-                        post.id,
-                        post.caption))
-                .from(post)
-                .join(like).on(like.post.id.eq(post.id))
-                .where(postIdLoe(cursor), like.member.id.eq(memberId))
-                .orderBy(post.id.desc())
-                .limit(size + 1)
-                .fetch();
-
-        Long nextCursor = null;
-        if(posts.size() > size) {
-            nextCursor = posts.get(posts.size() - 1).id();
             posts.remove(posts.size() - 1);
         }
 
@@ -106,5 +126,9 @@ public class PostQueryRepository {
 
     private BooleanExpression writerIdEq(Long writerId) {
         return writerId == null ? null : post.writer.id.eq(writerId);
+    }
+
+    private BooleanExpression likeMemberIdEq(Long memberId) {
+        return memberId == null ? null : like.member.id.eq(memberId);
     }
 }

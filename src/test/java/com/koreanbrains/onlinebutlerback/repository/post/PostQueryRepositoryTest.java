@@ -176,17 +176,17 @@ class PostQueryRepositoryTest {
         int size = 5;
 
         // when
-        Scroll<LikePostScrollDto> result = postQueryRepository.scrollLikePost(cursor, memberId, size);
+        Scroll<PostScrollDto> result = postQueryRepository.scrollLikePost(cursor, memberId, size);
 
         // then
         assertThat(result.getNextCursor()).isEqualTo(5L);
         assertThat(result.getNextSubCursor()).isNull();
         assertThat(result.getContent().size()).isEqualTo(size);
-        assertThat(result.getContent().get(0).caption()).isEqualTo("포스트 10");
-        assertThat(result.getContent().get(1).caption()).isEqualTo("포스트 9");
-        assertThat(result.getContent().get(2).caption()).isEqualTo("포스트 8");
-        assertThat(result.getContent().get(3).caption()).isEqualTo("포스트 7");
-        assertThat(result.getContent().get(4).caption()).isEqualTo("포스트 6");
+        assertThat(result.getContent().get(0).getCaption()).isEqualTo("포스트 10");
+        assertThat(result.getContent().get(1).getCaption()).isEqualTo("포스트 9");
+        assertThat(result.getContent().get(2).getCaption()).isEqualTo("포스트 8");
+        assertThat(result.getContent().get(3).getCaption()).isEqualTo("포스트 7");
+        assertThat(result.getContent().get(4).getCaption()).isEqualTo("포스트 6");
     }
 
     @Test
@@ -198,17 +198,17 @@ class PostQueryRepositoryTest {
         int size = 5;
 
         // when
-        Scroll<LikePostScrollDto> result = postQueryRepository.scrollLikePost(cursor, memberId, size);
+        Scroll<PostScrollDto> result = postQueryRepository.scrollLikePost(cursor, memberId, size);
 
         // then
         assertThat(result.getNextCursor()).isNull();
         assertThat(result.getNextSubCursor()).isNull();
         assertThat(result.getContent().size()).isEqualTo(size);
-        assertThat(result.getContent().get(0).caption()).isEqualTo("포스트 5");
-        assertThat(result.getContent().get(1).caption()).isEqualTo("포스트 4");
-        assertThat(result.getContent().get(2).caption()).isEqualTo("포스트 3");
-        assertThat(result.getContent().get(3).caption()).isEqualTo("포스트 2");
-        assertThat(result.getContent().get(4).caption()).isEqualTo("포스트 1");
+        assertThat(result.getContent().get(0).getCaption()).isEqualTo("포스트 5");
+        assertThat(result.getContent().get(1).getCaption()).isEqualTo("포스트 4");
+        assertThat(result.getContent().get(2).getCaption()).isEqualTo("포스트 3");
+        assertThat(result.getContent().get(3).getCaption()).isEqualTo("포스트 2");
+        assertThat(result.getContent().get(4).getCaption()).isEqualTo("포스트 1");
     }
 
 

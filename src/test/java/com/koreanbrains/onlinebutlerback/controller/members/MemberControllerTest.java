@@ -6,6 +6,7 @@ import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundExceptio
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.fixtures.FileFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.MemberFixture;
+import com.koreanbrains.onlinebutlerback.common.fixtures.PostFixture;
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberDto;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberQueryRepository;
@@ -172,12 +173,8 @@ class MemberControllerTest extends ControllerTest {
     @DisplayName("특정 사용자가 작성한 게시글 목록을 조회한다.")
     void scrollPostWriter() throws Exception {
         // given
-        List<PostScrollDto> content = List.of(
-                new PostScrollDto(10L, "포스트 내용", List.of("고양이", "뚱냥이")),
-                new PostScrollDto(9L, "포스트 내용", List.of("고양이", "뚱냥이")),
-                new PostScrollDto(8L, "포스트 내용", List.of("고양이", "뚱냥이")),
-                new PostScrollDto(7L, "포스트 내용", List.of("고양이", "뚱냥이"))
-        );
+
+        List<PostScrollDto> content = PostFixture.scrollPost(10L, 7L);
         given(postQueryRepository.scrollPost(anyLong(), anyInt(), anyLong()))
                 .willReturn(new Scroll<>(content, 6L, null));
 

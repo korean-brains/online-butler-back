@@ -149,12 +149,7 @@ class PostControllerTest extends ControllerTest {
     @DisplayName("포스트 목록을 무한스크롤로 조회한다")
     void scrollPost() throws Exception {
         // given
-        List<PostScrollDto> content = List.of(
-                new PostScrollDto(10L, "포스트 내용", List.of("고양이", "뚱냥이")),
-                new PostScrollDto(9L, "포스트 내용", List.of("고양이", "뚱냥이")),
-                new PostScrollDto(8L, "포스트 내용", List.of("고양이", "뚱냥이")),
-                new PostScrollDto(7L, "포스트 내용", List.of("고양이", "뚱냥이"))
-        );
+        List<PostScrollDto> content = PostFixture.scrollPost(10L, 7L);
         given(postQueryRepository.scrollPost(anyLong(), anyString(), anyInt()))
                 .willReturn(new Scroll<>(content, 6L, null));
 
@@ -209,12 +204,7 @@ class PostControllerTest extends ControllerTest {
     @WithRestMockUser
     void scrollLikePost() throws Exception {
         // given
-        List<LikePostScrollDto> content = List.of(
-                new LikePostScrollDto(10L, "포스트 내용"),
-                new LikePostScrollDto(9L, "포스트 내용"),
-                new LikePostScrollDto(8L, "포스트 내용"),
-                new LikePostScrollDto(7L, "포스트 내용")
-        );
+        List<PostScrollDto> content = PostFixture.scrollPost(10L, 7L);
         given(postQueryRepository.scrollLikePost(anyLong(), anyLong(), anyInt()))
                 .willReturn(new Scroll<>(content, 6L, null));
 
