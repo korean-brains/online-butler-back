@@ -1,4 +1,6 @@
 package com.koreanbrains.onlinebutlerback.controller.members;
 
-public record MemberUpdateRequest(String name, String introduction) {
+import org.springframework.web.multipart.MultipartFile;
+
+public record MemberUpdateRequest(String name, String introduction, MultipartFile profileImage) {
 }
