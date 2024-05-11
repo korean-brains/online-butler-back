@@ -37,26 +37,17 @@ public class MemberController {
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    @PatchMapping("/{member-id}")
+    @PostMapping("/{member-id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateMember(@PathVariable("member-id") Long memberId,
-                             @RequestBody MemberUpdateRequest request){
-        memberService.updateMember(memberId, request.name(), request.introduction());
+                             @ModelAttribute MemberUpdateRequest request){
+        memberService.updateMember(memberId, request.name(), request.introduction(), request.profileImage());
     }
 
     @DeleteMapping("/{member-id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Long disableMember(@PathVariable("member-id") Long memberId){
         return memberService.disableMember(memberId);
-    }
-
-    @PostMapping("/me/profile-image")
-    @PreAuthorize("isAuthenticated()")
-    public ProfileImageUpdateResponse updateProfileImage(@AuthenticationPrincipal AccountDto accountDto,
-                                                         @ModelAttribute ProfileImageUpdateRequest request) {
-
-        String profileImageUrl = memberService.updateProfileImage(accountDto.getId(), request.profileImage());
-        return new ProfileImageUpdateResponse(profileImageUrl);
     }
 
     @GetMapping("/me")

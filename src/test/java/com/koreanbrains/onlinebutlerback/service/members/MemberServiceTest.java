@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.Optional;
 
@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doNothing;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,26 +83,80 @@ public class MemberServiceTest {
     void updateMember() {
         // given
         Member member = MemberFixture.member();
+        String name = "changedName";
+        String introduction = "changedIntroduction";
+        MockMultipartFile profileImage = FileFixture.multipartImage("profileImage");
+        UploadFile uploadFile = FileFixture.uploadFile();
+
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+        given(fileStore.upload(any(), anyString())).willReturn(uploadFile);
+        given(fileStore.hasFile(any())).willReturn(true);
 
         // when
-        memberService.updateMember(1L, "changedName", "changedIntroduction");
+        memberService.updateMember(1L, name, introduction, profileImage);
 
         // then
         assertThat(member.getName()).isEqualTo("changedName");
         assertThat(member.getIntroduction()).isEqualTo("changedIntroduction");
+        assertThat(member.getProfileImage().getUrl()).isEqualTo(uploadFile.url());
+    }
+
+    @Test
+    @DisplayName("프로필 이미지 변경시 기존 이미지는 삭제한다")
+    void updateProfileDeleteOld() {
+        // given
+        Member member = MemberFixture.memberWithProfileImage();
+        String name = "changedName";
+        String introduction = "changedIntroduction";
+        MockMultipartFile profileImage = FileFixture.multipartImage("profileImage");
+        UploadFile uploadFile = FileFixture.uploadFile();
+        String deleteImage = member.getProfileImage().getStoreFilename();
+
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+        given(fileStore.upload(any(), anyString())).willReturn(uploadFile);
+        given(fileStore.hasFile(any())).willReturn(true);
+        doNothing().when(fileStore).delete(anyString());
+
+        // when
+        memberService.updateMember(1L, name, introduction, profileImage);
+
+        // then
+        then(fileStore).should().delete(deleteImage);
+    }
+
+    @Test
+    @DisplayName("프로필 변경시 프로필 이미지 파라미터가 유효하지 않으면 프로필 이미지는 변경하지 않는다.")
+    void updateProfileWithoutProfileImage() {
+        // given
+        Member member = MemberFixture.memberWithProfileImage();
+        String name = "changedName";
+        String introduction = "changedIntroduction";
+        MockMultipartFile profileImage = null;
+        String beforeUpdateProfileImage = member.getProfileImage().getUrl();
+
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
+
+        // when
+        memberService.updateMember(1L, name, introduction, profileImage);
+
+        // then
+        assertThat(member.getProfileImage().getUrl()).isEqualTo(beforeUpdateProfileImage);
     }
 
     @Test
     @DisplayName("업데이트할 멤버가 없으면 404 예외가 발생한다")
     void failUpdateMember() {
         // given
+        Long memberId = 1L;
+        String name = "changedName";
+        String introduction = "changedIntroduction";
+        MockMultipartFile profileImage = FileFixture.multipartImage("profileImage");
         given(memberRepository.findById(any())).willReturn(Optional.empty());
 
         // when
 
         // then
-        assertThatThrownBy(() -> memberService.updateMember(1L, "changedName", "changedIntroduction"))
+        assertThatThrownBy(() -> memberService.updateMember(memberId, name, introduction, profileImage))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
@@ -130,57 +185,5 @@ public class MemberServiceTest {
         // then
         assertThatThrownBy(() -> memberService.disableMember(1L))
                 .isInstanceOf(EntityNotFoundException.class);
-    }
-
-    @Test
-    @DisplayName("사용자 프로필 이미지를 변경한다")
-    void updateProfileImage() {
-        // given
-        Member member = MemberFixture.member();
-        UploadFile uploadFile = FileFixture.uploadFile();
-        MultipartFile profileImage = FileFixture.multipartImage();
-
-        given(fileStore.upload(any(), anyString())).willReturn(uploadFile);
-        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
-
-        // when
-        String updatedProfileImage = memberService.updateProfileImage(member.getId(), profileImage);
-
-        // then
-        assertThat(updatedProfileImage).isEqualTo(uploadFile.url());
-    }
-
-    @Test
-    @DisplayName("프로필 이미지를 변경할 사용자가 존재하지 않으면 예외가 발생한다")
-    void updateProfileImageFailNoMember() {
-        // given
-        Member member = MemberFixture.member();
-        MultipartFile profileImage = FileFixture.multipartImage();
-
-        given(memberRepository.findById(anyLong())).willReturn(Optional.empty());
-
-        // when
-        // then
-        assertThatThrownBy(() -> memberService.updateProfileImage(member.getId(), profileImage))
-                .isInstanceOf(EntityNotFoundException.class);
-    }
-
-    @Test
-    @DisplayName("프로필 이미지 변경시 기존 이미지는 삭제한다")
-    void updateProfileDeleteOld() {
-        // given
-        Member member = MemberFixture.memberWithProfileImage();
-        UploadFile uploadFile = FileFixture.uploadFile();
-        MultipartFile profileImage = FileFixture.multipartImage();
-
-        given(fileStore.upload(any(), anyString())).willReturn(uploadFile);
-        doNothing().when(fileStore).delete(anyString());
-        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
-
-        // when
-        String updatedProfileImage = memberService.updateProfileImage(member.getId(), profileImage);
-
-        // then
-        assertThat(updatedProfileImage).isEqualTo(uploadFile.url());
     }
 }

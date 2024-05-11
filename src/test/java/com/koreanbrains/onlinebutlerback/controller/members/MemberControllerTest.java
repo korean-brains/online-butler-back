@@ -98,13 +98,14 @@ class MemberControllerTest extends ControllerTest {
     @DisplayName("멤버 프로필을 수정한다.")
     void updateMember() throws Exception {
         // given
-        doNothing().when(memberService).updateMember(anyLong(), anyString(), anyString());
-        MemberUpdateRequest request = new MemberUpdateRequest("lee", "hello");
+        doNothing().when(memberService).updateMember(anyLong(), anyString(), anyString(), any());
+        MemberUpdateRequest request = new MemberUpdateRequest("lee", "hello", FileFixture.multipartImage("profileImage"));
 
         // when
-        ResultActions result = mockMvc.perform(patch("/api/member/{memberId}", 1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(request)));
+        ResultActions result = mockMvc.perform(multipart("/api/member/{memberId}", 1)
+                .file((MockMultipartFile) request.profileImage())
+                .param("name", request.name())
+                .param("introduction", request.introduction()));
 
         // then
         result.andExpect(status().isNoContent());
@@ -122,22 +123,6 @@ class MemberControllerTest extends ControllerTest {
         // then
         result.andExpect(status().isNoContent())
                 .andExpect(content().string("1"));
-    }
-
-    @Test
-    @DisplayName("프로필 이미지를 변경한다")
-    @WithRestMockUser
-    void updateProfileImage() throws Exception {
-        // given
-        MockMultipartFile image = FileFixture.multipartImage("profileImage");
-        given(memberService.updateProfileImage(anyLong(), any())).willReturn("assets/image.jpg");
-
-        // when
-        ResultActions result = mockMvc.perform(multipart("/api/member/me/profile-image")
-                .file(image));
-
-        // then
-        result.andExpect(status().isOk());
     }
 
     @Test

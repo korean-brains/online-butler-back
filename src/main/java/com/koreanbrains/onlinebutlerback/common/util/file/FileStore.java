@@ -52,6 +52,10 @@ public class FileStore {
         }
     }
 
+    public boolean hasFile(MultipartFile file) {
+        return (file != null && !file.isEmpty());
+    }
+
     private String getRequestUrl(String filename) {
         return requestUrl + "/" + filename;
     }
@@ -71,7 +75,7 @@ public class FileStore {
     }
 
     private void validationFile(MultipartFile multipartFile) {
-        if (multipartFile == null || multipartFile.isEmpty()) {
+        if (!hasFile(multipartFile)) {
             throw new IOException(ErrorCode.FILE_INVALID);
         }
     }

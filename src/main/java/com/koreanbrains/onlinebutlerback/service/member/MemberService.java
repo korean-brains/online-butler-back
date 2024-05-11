@@ -38,9 +38,15 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateMember(Long memberId, String name, String introduction) {
+    public void updateMember(Long memberId, String name, String introduction, MultipartFile profileImage) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if (fileStore.hasFile(profileImage)) {
+            if (findMember.getProfileImage() != null) deleteOldProfileImage(findMember);
+            UploadFile uploadedImage = fileStore.upload(profileImage, UUID.randomUUID().toString());
+            findMember.updateProfileImage(new UploadedFile(uploadedImage));
+        }
 
         findMember.updateName(name);
         findMember.updateIntroduction(introduction);
@@ -54,21 +60,6 @@ public class MemberService {
         findMember.disableMember();
 
         return findMember.getId();
-    }
-
-    @Transactional
-    public String updateProfileImage(Long memberId, MultipartFile profileImage) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-        if (member.getProfileImage() != null) {
-            deleteOldProfileImage(member);
-        }
-
-        UploadFile uploadedImage = fileStore.upload(profileImage, UUID.randomUUID().toString());
-        member.updateProfileImage(new UploadedFile(uploadedImage));
-
-        return uploadedImage.url();
     }
 
     private void deleteOldProfileImage(Member member) {
