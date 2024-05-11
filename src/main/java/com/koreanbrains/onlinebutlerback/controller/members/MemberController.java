@@ -38,10 +38,10 @@ public class MemberController {
     }
 
     @PatchMapping("/{member-id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Long updateMember(@PathVariable("member-id") Long memberId,
-                             @RequestBody MemberUpdateRequest dto){
-        return memberService.updateMember(memberId, dto.name());
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateMember(@PathVariable("member-id") Long memberId,
+                             @RequestBody MemberUpdateRequest request){
+        memberService.updateMember(memberId, request.name(), request.introduction());
     }
 
     @DeleteMapping("/{member-id}")

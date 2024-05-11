@@ -38,13 +38,12 @@ public class MemberService {
     }
 
     @Transactional
-    public Long updateMember(Long memberId, String name) {
+    public void updateMember(Long memberId, String name, String introduction) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         findMember.updateName(name);
-
-        return findMember.getId();
+        findMember.updateIntroduction(introduction);
     }
 
     @Transactional

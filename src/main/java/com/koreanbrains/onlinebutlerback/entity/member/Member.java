@@ -22,6 +22,7 @@ public class Member extends BaseTimeEntity {
     private String name;
     private String email;
     private String password;
+    private String introduction;
 
     @Builder.Default
     @ColumnDefault("'ROLE_USER'")
@@ -44,5 +45,9 @@ public class Member extends BaseTimeEntity {
 
     public void updateProfileImage(UploadedFile profileImage) {
         this.profileImage = profileImage;
+    }
+
+    public void updateIntroduction(String introduction) {
+        this.introduction = introduction;
     }
 }

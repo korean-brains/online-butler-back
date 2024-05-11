@@ -27,6 +27,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -94,11 +95,11 @@ class MemberControllerTest extends ControllerTest {
     }
 
     @Test
-    @DisplayName("멤버 이름을 수정한다.")
+    @DisplayName("멤버 프로필을 수정한다.")
     void updateMember() throws Exception {
         // given
-        given(memberService.updateMember(anyLong(), anyString())).willReturn(1L);
-        MemberUpdateRequest request = new MemberUpdateRequest("lee");
+        doNothing().when(memberService).updateMember(anyLong(), anyString(), anyString());
+        MemberUpdateRequest request = new MemberUpdateRequest("lee", "hello");
 
         // when
         ResultActions result = mockMvc.perform(patch("/api/member/{memberId}", 1)
@@ -106,8 +107,7 @@ class MemberControllerTest extends ControllerTest {
                 .content(objectMapper.writeValueAsBytes(request)));
 
         // then
-        result.andExpect(status().isOk())
-                .andExpect(content().string("1"));
+        result.andExpect(status().isNoContent());
     }
 
     @Test

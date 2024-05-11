@@ -26,6 +26,7 @@ public class MemberQueryRepository {
                         member.name,
                         member.email,
                         member.profileImage.url,
+                        member.introduction,
                         JPAExpressions.select(post.count())
                                 .from(post)
                                 .where(post.writer.eq(member)),

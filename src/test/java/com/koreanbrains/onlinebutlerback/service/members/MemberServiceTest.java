@@ -78,17 +78,18 @@ public class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("멤버 이름을 수정한다")
+    @DisplayName("멤버 프로필을 수정한다")
     void updateMember() {
         // given
         Member member = MemberFixture.member();
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
 
         // when
-        memberService.updateMember(1L, "changedName");
+        memberService.updateMember(1L, "changedName", "changedIntroduction");
 
         // then
         assertThat(member.getName()).isEqualTo("changedName");
+        assertThat(member.getIntroduction()).isEqualTo("changedIntroduction");
     }
 
     @Test
@@ -100,7 +101,7 @@ public class MemberServiceTest {
         // when
 
         // then
-        assertThatThrownBy(() -> memberService.updateMember(1L, "changedName"))
+        assertThatThrownBy(() -> memberService.updateMember(1L, "changedName", "changedIntroduction"))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
