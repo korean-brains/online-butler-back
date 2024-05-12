@@ -26,7 +26,7 @@ public class DonationService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void save(String receiptId, Long giverId, Long receiverId) {
+    public void save(String receiptId, Long giverId, Long receiverId, String message) {
         Member giver = memberRepository.findById(giverId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         Member receiver = memberRepository.findById(receiverId)
@@ -47,6 +47,7 @@ public class DonationService {
                 .giver(giver)
                 .receiver(receiver)
                 .amount(amount)
+                .message(message)
                 .createdAt(createdAt)
                 .build();
 
