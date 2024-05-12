@@ -28,6 +28,7 @@ public class Donation {
     private String receiptId;
 
     private int amount;
+    private String message;
 
     private LocalDateTime createdAt;
 

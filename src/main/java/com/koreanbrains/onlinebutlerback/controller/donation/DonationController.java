@@ -25,7 +25,7 @@ public class DonationController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("isAuthenticated()")
     public void verify(@RequestBody DonationRequest request) {
-        donationService.save(request.receiptId(), request.giverId(), request.receiverId());
+        donationService.save(request.receiptId(), request.giverId(), request.receiverId(), request.message());
     }
 
     @GetMapping("/give")

@@ -42,13 +42,14 @@ class DonationServiceTest {
         Member giver = MemberFixture.member(1L);
         Member receiver = MemberFixture.member(2L);
         HashMap<String, Object> receipt = DonationFixture.receipt();
+        String message = "message";
 
         given(memberRepository.findById(eq(1L))).willReturn(Optional.of(giver));
         given(memberRepository.findById(eq(2L))).willReturn(Optional.of(receiver));
         given(bootpayClient.getReceipt(anyString())).willReturn(receipt);
 
         // when
-        donationService.save(receiptId, giver.getId(), receiver.getId());
+        donationService.save(receiptId, giver.getId(), receiver.getId(), message);
 
         // then
         then(donationRepository).should().save(any());
@@ -61,12 +62,13 @@ class DonationServiceTest {
         String receiptId = "66094df500be0400302256f1";
         Member giver = MemberFixture.member(1L);
         Member receiver = MemberFixture.member(2L);
+        String message = "message";
 
         given(memberRepository.findById(eq(1L))).willReturn(Optional.empty());
 
         // when
         // then
-        assertThatThrownBy(() -> donationService.save(receiptId, giver.getId(), receiver.getId()))
+        assertThatThrownBy(() -> donationService.save(receiptId, giver.getId(), receiver.getId(), message))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
@@ -77,13 +79,14 @@ class DonationServiceTest {
         String receiptId = "66094df500be0400302256f1";
         Member giver = MemberFixture.member(1L);
         Member receiver = MemberFixture.member(2L);
+        String message = "message";
 
         given(memberRepository.findById(eq(1L))).willReturn(Optional.of(giver));
         given(memberRepository.findById(eq(2L))).willReturn(Optional.empty());
 
         // when
         // then
-        assertThatThrownBy(() -> donationService.save(receiptId, giver.getId(), receiver.getId()))
+        assertThatThrownBy(() -> donationService.save(receiptId, giver.getId(), receiver.getId(), message))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
@@ -95,6 +98,7 @@ class DonationServiceTest {
         Member giver = MemberFixture.member(1L);
         Member receiver = MemberFixture.member(2L);
         HashMap<String, Object> receipt = DonationFixture.receiptWithErrorCode();
+        String message = "message";
 
         given(memberRepository.findById(eq(1L))).willReturn(Optional.of(giver));
         given(memberRepository.findById(eq(2L))).willReturn(Optional.of(receiver));
@@ -102,7 +106,7 @@ class DonationServiceTest {
 
         // when
         // then
-        assertThatThrownBy(() -> donationService.save(receiptId, giver.getId(), receiver.getId()))
+        assertThatThrownBy(() -> donationService.save(receiptId, giver.getId(), receiver.getId(), message))
                 .isInstanceOf(DonationException.class);
     }
 
