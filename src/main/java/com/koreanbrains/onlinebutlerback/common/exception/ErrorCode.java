@@ -40,6 +40,9 @@ public enum ErrorCode {
     FILE_INVALID(400, "F_003", "유효하지 않은 파일입니다."),
     FILE_NOT_LOADED(500, "F_004", "파일을 로드할 수 없습니다."),
 
+    ALREADY_FOLLOWED(400, "FW_001", "이미 팔로우한 사용자입니다."),
+    ALREADY_UNFOLLOWED(400, "FW_002", "이미 언팔로우한 사용자입니다."),
+
     ;
 
     private final int status;
