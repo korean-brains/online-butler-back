@@ -5,9 +5,12 @@ import com.koreanbrains.onlinebutlerback.common.context.WithRestMockUser;
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.fixtures.FileFixture;
+import com.koreanbrains.onlinebutlerback.common.fixtures.FollowFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.MemberFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.PostFixture;
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
+import com.koreanbrains.onlinebutlerback.repository.follow.FollowDto;
+import com.koreanbrains.onlinebutlerback.repository.follow.FollowQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberDto;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
@@ -42,6 +45,8 @@ class MemberControllerTest extends ControllerTest {
     MemberQueryRepository memberQueryRepository;
     @MockBean
     PostQueryRepository postQueryRepository;
+    @MockBean
+    FollowQueryRepository followQueryRepository;
 
     @Test
     @DisplayName("멤버를 생성한다")
@@ -177,6 +182,54 @@ class MemberControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.content[0].id").exists())
                 .andExpect(jsonPath("$.content[0].caption").exists())
                 .andExpect(jsonPath("$.content[0].tags").exists());
+    }
+
+    @Test
+    @DisplayName("팔로우 목록을 조회한다.")
+    void getFollowList() throws Exception {
+        // given
+        List<FollowDto> content = FollowFixture.followList(1L, 5L);
+        given(followQueryRepository.findFollowingList(anyLong(), anyLong(), anyInt()))
+                .willReturn(new Scroll<>(content, 6L, null));
+
+        // when
+        ResultActions result = mockMvc.perform(get("/api/member/{memberId}/following", 1)
+                .param("cursor", "1")
+                .param("size", "5"));
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.nextCursor").value(6))
+                .andExpect(jsonPath("$.nextSubCursor").isEmpty())
+                .andExpect(jsonPath("$.content.length()").value(5))
+                .andExpect(jsonPath("$.content[0].id").exists())
+                .andExpect(jsonPath("$.content[0].memberId").exists())
+                .andExpect(jsonPath("$.content[0].name").exists())
+                .andExpect(jsonPath("$.content[0].profileImage").exists());
+    }
+
+    @Test
+    @DisplayName("팔로워 목록을 조회한다.")
+    void getFollowerList() throws Exception {
+        // given
+        List<FollowDto> content = FollowFixture.followList(1L, 5L);
+        given(followQueryRepository.findFollowerList(anyLong(), anyLong(), anyInt()))
+                .willReturn(new Scroll<>(content, 6L, null));
+
+        // when
+        ResultActions result = mockMvc.perform(get("/api/member/{memberId}/follower", 1)
+                .param("cursor", "1")
+                .param("size", "5"));
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.nextCursor").value(6))
+                .andExpect(jsonPath("$.nextSubCursor").isEmpty())
+                .andExpect(jsonPath("$.content.length()").value(5))
+                .andExpect(jsonPath("$.content[0].id").exists())
+                .andExpect(jsonPath("$.content[0].memberId").exists())
+                .andExpect(jsonPath("$.content[0].name").exists())
+                .andExpect(jsonPath("$.content[0].profileImage").exists());
     }
 
 }
