@@ -66,10 +66,11 @@ class PostControllerTest extends ControllerTest {
 
     @Test
     @DisplayName("포스트를 조회한다")
+    @WithRestMockUser
     void getPost() throws Exception {
         // given
         PostDto postDto = PostFixture.postDto();
-        given(postQueryRepository.findById(anyLong())).willReturn(Optional.of(postDto));
+        given(postQueryRepository.findById(anyLong(), anyLong())).willReturn(Optional.of(postDto));
 
         // when
         ResultActions result = mockMvc.perform(get("/api/post/{postId}", 1));
@@ -84,6 +85,7 @@ class PostControllerTest extends ControllerTest {
 
     @Test
     @DisplayName("존재하지 않는 포스트를 조회하면 404를 반환한다")
+    @WithRestMockUser
     void failGetPost() throws Exception {
         // given
         given(postRepository.findById(anyLong())).willReturn(Optional.empty());
@@ -128,10 +130,11 @@ class PostControllerTest extends ControllerTest {
 
     @Test
     @DisplayName("포스트 목록을 무한스크롤로 조회한다")
+    @WithRestMockUser
     void scrollPost() throws Exception {
         // given
         List<PostScrollDto> content = PostFixture.scrollPost(10L, 7L);
-        given(postQueryRepository.scrollPost(anyLong(), anyString(), anyInt()))
+        given(postQueryRepository.scrollPost(anyLong(), anyLong(), anyString(), anyInt()))
                 .willReturn(new Scroll<>(content, 6L, null));
 
         // when
@@ -186,7 +189,7 @@ class PostControllerTest extends ControllerTest {
     void scrollLikePost() throws Exception {
         // given
         List<PostScrollDto> content = PostFixture.scrollPost(10L, 7L);
-        given(postQueryRepository.scrollLikePost(anyLong(), anyLong(), anyInt()))
+        given(postQueryRepository.scrollLikePost(anyLong(), anyLong(), anyLong(), anyInt()))
                 .willReturn(new Scroll<>(content, 6L, null));
 
         // when

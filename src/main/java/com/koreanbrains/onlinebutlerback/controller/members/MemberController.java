@@ -62,10 +62,11 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}/post")
-    public Scroll<PostScrollDto> scrollWrittenPost(@PathVariable("memberId") Long memberId,
+    public Scroll<PostScrollDto> scrollWrittenPost(@AuthenticationPrincipal AccountDto accountDto,
+                                                   @PathVariable("memberId") Long memberId,
                                                    @ModelAttribute PostScrollRequest request) {
 
-        return postQueryRepository.scrollPost(request.cursor(), request.size(), memberId);
+        return postQueryRepository.scrollPost(accountDto.getId(), request.cursor(), request.size(), memberId);
     }
 
     @GetMapping("/{memberId}/following")

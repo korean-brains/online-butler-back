@@ -7,6 +7,7 @@ import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -20,6 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.koreanbrains.onlinebutlerback.entity.comment.QComment.*;
+import static com.koreanbrains.onlinebutlerback.entity.follow.QFollow.follow;
 import static com.koreanbrains.onlinebutlerback.entity.like.QLike.*;
 import static com.koreanbrains.onlinebutlerback.entity.member.QMember.*;
 import static com.koreanbrains.onlinebutlerback.entity.post.QPost.*;
@@ -35,19 +37,19 @@ public class PostQueryRepository {
         this.queryFactory = new JPAQueryFactory(JPQLTemplates.DEFAULT, em);
     }
 
-    public Scroll<PostScrollDto> scrollPost(Long cursor, int size, Long writerId) {
-        return scrollPost(cursor, null, size, writerId, null);
+    public Scroll<PostScrollDto> scrollPost(Long myId, Long cursor, int size, Long writerId) {
+        return scrollPost(myId, cursor, null, size, writerId, null);
     }
 
-    public Scroll<PostScrollDto> scrollPost(Long cursor, String tagName, int size) {
-        return scrollPost(cursor, tagName, size, null, null);
+    public Scroll<PostScrollDto> scrollPost(Long myId, Long cursor, String tagName, int size) {
+        return scrollPost(myId, cursor, tagName, size, null, null);
     }
 
-    public Scroll<PostScrollDto> scrollLikePost(Long cursor, Long memberId, int size) {
-        return scrollPost(cursor, null, size, null, memberId);
+    public Scroll<PostScrollDto> scrollLikePost(Long myId, Long cursor, Long memberId, int size) {
+        return scrollPost(myId, cursor, null, size, null, memberId);
     }
 
-    public Scroll<PostScrollDto> scrollPost(Long cursor, String tagName, int size, Long writerId, Long likeMemberId) {
+    public Scroll<PostScrollDto> scrollPost(Long myId, Long cursor, String tagName, int size, Long writerId, Long likeMemberId) {
         List<PostScrollDto> posts = queryFactory
                 .select(Projections.constructor(PostScrollDto.class,
                         post.id,
@@ -63,7 +65,10 @@ public class PostQueryRepository {
                                 member.id,
                                 member.name,
                                 member.profileImage.url,
-                                Expressions.constant(false)
+                                JPAExpressions.selectOne()
+                                        .from(follow)
+                                        .where(isFollow(myId, member.id))
+                                        .exists()
                         )
                 ))
                 .from(post)
@@ -116,7 +121,7 @@ public class PostQueryRepository {
         return new Scroll<>(posts, nextCursor, null);
     }
 
-    public Optional<PostDto> findById(Long postId) {
+    public Optional<PostDto> findById(Long myId, Long postId) {
         Map<Long, PostDto> result = queryFactory
                 .from(post)
                 .join(post.writer, member)
@@ -138,7 +143,10 @@ public class PostQueryRepository {
                                         member.id,
                                         member.name,
                                         member.profileImage.url,
-                                        Expressions.constant(false)
+                                        JPAExpressions.selectOne()
+                                                .from(follow)
+                                                .where(isFollow(myId, member.id))
+                                                .exists()
                                 ), "writer"),
                                 GroupBy.list(tag.name).as("tags")
                         )));
@@ -171,5 +179,10 @@ public class PostQueryRepository {
 
     private BooleanExpression likeMemberIdEq(Long memberId) {
         return memberId == null ? null : like.member.id.eq(memberId);
+    }
+
+    private BooleanExpression isFollow(Long myId, NumberPath<Long> memberId) {
+        if(myId == null) return null;
+        return follow.follower.id.eq(myId).and(follow.following.id.eq(memberId));
     }
 }

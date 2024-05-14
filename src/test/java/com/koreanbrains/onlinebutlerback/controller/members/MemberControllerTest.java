@@ -161,11 +161,12 @@ class MemberControllerTest extends ControllerTest {
 
     @Test
     @DisplayName("특정 사용자가 작성한 게시글 목록을 조회한다.")
+    @WithRestMockUser
     void scrollPostWriter() throws Exception {
         // given
 
         List<PostScrollDto> content = PostFixture.scrollPost(10L, 7L);
-        given(postQueryRepository.scrollPost(anyLong(), anyInt(), anyLong()))
+        given(postQueryRepository.scrollPost(anyLong(), anyLong(), anyInt(), anyLong()))
                 .willReturn(new Scroll<>(content, 6L, null));
 
         // when
