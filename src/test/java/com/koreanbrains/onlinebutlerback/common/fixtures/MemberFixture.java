@@ -42,6 +42,6 @@ public class MemberFixture {
     }
 
     public static MemberDto memberDto() {
-        return new MemberDto(1L, "kim", "kim@gmail.com", "assets/image.jpg", "hello", 10, 10, 10);
+        return new MemberDto(1L, "kim", "kim@gmail.com", "assets/image.jpg", "hello", 10, 10, 10, false);
     }
 }

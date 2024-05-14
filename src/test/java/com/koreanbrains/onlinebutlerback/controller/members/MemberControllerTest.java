@@ -67,10 +67,11 @@ class MemberControllerTest extends ControllerTest {
 
     @Test
     @DisplayName("멤버를 조회한다")
+    @WithRestMockUser
     void getMember() throws Exception {
         // given
         MemberDto member = MemberFixture.memberDto();
-        given(memberQueryRepository.findById(anyLong())).willReturn(Optional.of(member));
+        given(memberQueryRepository.findById(anyLong(), anyLong())).willReturn(Optional.of(member));
 
         // when
         ResultActions result = mockMvc.perform(get("/api/member/{memberId}", 1));
@@ -88,6 +89,7 @@ class MemberControllerTest extends ControllerTest {
 
     @Test
     @DisplayName("존재하지 않는 멤버를 조회하면 404를 반환한다")
+    @WithRestMockUser
     void failGetMember() throws Exception {
         // given
         given(memberService.getMember(anyLong())).willThrow(new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -136,7 +138,7 @@ class MemberControllerTest extends ControllerTest {
     void findMe() throws Exception {
         // given
         MemberDto memberDto = MemberFixture.memberDto();
-        given(memberQueryRepository.findById(anyLong())).willReturn(Optional.of(memberDto));
+        given(memberQueryRepository.findById(any(), anyLong())).willReturn(Optional.of(memberDto));
 
         // when
         ResultActions result = mockMvc.perform(get("/api/member/me"));
@@ -150,7 +152,7 @@ class MemberControllerTest extends ControllerTest {
     @WithRestMockUser
     void findMeFailNotFound() throws Exception {
         // given
-        given(memberQueryRepository.findById(anyLong())).willReturn(Optional.empty());
+        given(memberQueryRepository.findById(anyLong(), anyLong())).willReturn(Optional.empty());
 
         // when
         ResultActions result = mockMvc.perform(get("/api/member/me"));

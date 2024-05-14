@@ -31,33 +31,35 @@ public class MemberController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Long createMember(@RequestBody MemberCreateRequest dto){
+    public Long createMember(@RequestBody MemberCreateRequest dto) {
         return memberService.createMember(dto.name(), dto.email(), dto.password());
     }
 
     @GetMapping("/{member-id}")
-    public MemberDto getMember(@PathVariable("member-id") Long memberId){
-        return memberQueryRepository.findById(memberId)
+    public MemberDto getMember(@AuthenticationPrincipal AccountDto accountDto,
+                               @PathVariable("member-id") Long memberId) {
+
+        return memberQueryRepository.findById(accountDto.getId(), memberId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     @PostMapping("/{member-id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateMember(@PathVariable("member-id") Long memberId,
-                             @ModelAttribute MemberUpdateRequest request){
+                             @ModelAttribute MemberUpdateRequest request) {
         memberService.updateMember(memberId, request.name(), request.introduction(), request.profileImage());
     }
 
     @DeleteMapping("/{member-id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Long disableMember(@PathVariable("member-id") Long memberId){
+    public Long disableMember(@PathVariable("member-id") Long memberId) {
         return memberService.disableMember(memberId);
     }
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public MemberDto getMe(@AuthenticationPrincipal AccountDto accountDto) {
-        return memberQueryRepository.findById(accountDto.getId())
+        return memberQueryRepository.findById(null, accountDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
@@ -78,7 +80,7 @@ public class MemberController {
 
     @GetMapping("/{memberId}/follower")
     public Scroll<FollowDto> scrollFollowerList(@PathVariable("memberId") Long memberId,
-                                                 @ModelAttribute FollowingListScrollRequest request) {
+                                                @ModelAttribute FollowingListScrollRequest request) {
 
         return followQueryRepository.findFollowerList(memberId, request.getCursor(), request.getSize());
     }
