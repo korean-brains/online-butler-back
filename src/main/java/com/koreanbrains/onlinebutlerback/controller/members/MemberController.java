@@ -4,7 +4,10 @@ import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundExceptio
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
+import com.koreanbrains.onlinebutlerback.controller.follow.FollowingListScrollRequest;
 import com.koreanbrains.onlinebutlerback.controller.post.PostScrollRequest;
+import com.koreanbrains.onlinebutlerback.repository.follow.FollowDto;
+import com.koreanbrains.onlinebutlerback.repository.follow.FollowQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberDto;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
@@ -24,6 +27,7 @@ public class MemberController {
     private final MemberService memberService;
     private final MemberQueryRepository memberQueryRepository;
     private final PostQueryRepository postQueryRepository;
+    private final FollowQueryRepository followQueryRepository;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -62,6 +66,20 @@ public class MemberController {
                                                    @ModelAttribute PostScrollRequest request) {
 
         return postQueryRepository.scrollPost(request.cursor(), request.size(), memberId);
+    }
+
+    @GetMapping("/{memberId}/following")
+    public Scroll<FollowDto> scrollFollowingList(@PathVariable("memberId") Long memberId,
+                                                 @ModelAttribute FollowingListScrollRequest request) {
+
+        return followQueryRepository.findFollowingList(memberId, request.getCursor(), request.getSize());
+    }
+
+    @GetMapping("/{memberId}/follower")
+    public Scroll<FollowDto> scrollFollowerList(@PathVariable("memberId") Long memberId,
+                                                 @ModelAttribute FollowingListScrollRequest request) {
+
+        return followQueryRepository.findFollowerList(memberId, request.getCursor(), request.getSize());
     }
 
 }

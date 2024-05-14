@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class ScrollRequest<C, SC> {
+public abstract class ScrollRequest<C, SC> {
     private C cursor;
     private SC subCursor;
 
