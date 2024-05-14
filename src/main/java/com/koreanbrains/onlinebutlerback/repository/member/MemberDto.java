@@ -7,5 +7,6 @@ public record MemberDto(Long id,
                         String introduction,
                         long postCount,
                         long followerCount,
-                        long followingCount) {
+                        long followingCount,
+                        boolean isFollowed) {
 }

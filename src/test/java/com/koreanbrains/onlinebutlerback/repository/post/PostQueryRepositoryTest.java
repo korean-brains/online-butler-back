@@ -91,7 +91,7 @@ class PostQueryRepositoryTest {
         int size = 5;
 
         // when
-        Scroll<PostScrollDto> result = postQueryRepository.scrollPost(cursor, tagName, size);
+        Scroll<PostScrollDto> result = postQueryRepository.scrollPost(1L, cursor, tagName, size);
 
         // then
         assertThat(result.getNextCursor()).isEqualTo(5L);
@@ -113,7 +113,7 @@ class PostQueryRepositoryTest {
         int size = 5;
 
         // when
-        Scroll<PostScrollDto> result = postQueryRepository.scrollPost(cursor, tagName, size);
+        Scroll<PostScrollDto> result = postQueryRepository.scrollPost(1L, cursor, tagName, size);
 
         // then
         assertThat(result.getNextCursor()).isNull();
@@ -135,7 +135,7 @@ class PostQueryRepositoryTest {
         int size = 5;
 
         // when
-        Scroll<PostScrollDto> result = postQueryRepository.scrollPost(cursor, tagName, size);
+        Scroll<PostScrollDto> result = postQueryRepository.scrollPost(1L, cursor, tagName, size);
 
         // then
         assertThat(result.getNextCursor()).isEqualTo(5L);
@@ -157,7 +157,7 @@ class PostQueryRepositoryTest {
         int size = 5;
 
         // when
-        Scroll<PostScrollDto> result = postQueryRepository.scrollPost(cursor, size, writerId);
+        Scroll<PostScrollDto> result = postQueryRepository.scrollPost(1L, cursor, size, writerId);
 
         // then
         assertThat(result.getNextCursor()).isEqualTo(5L);
@@ -179,7 +179,7 @@ class PostQueryRepositoryTest {
         int size = 5;
 
         // when
-        Scroll<PostScrollDto> result = postQueryRepository.scrollLikePost(cursor, memberId, size);
+        Scroll<PostScrollDto> result = postQueryRepository.scrollLikePost(1L, cursor, memberId, size);
 
         // then
         assertThat(result.getNextCursor()).isEqualTo(5L);
@@ -201,7 +201,7 @@ class PostQueryRepositoryTest {
         int size = 5;
 
         // when
-        Scroll<PostScrollDto> result = postQueryRepository.scrollLikePost(cursor, memberId, size);
+        Scroll<PostScrollDto> result = postQueryRepository.scrollLikePost(1L, cursor, memberId, size);
 
         // then
         assertThat(result.getNextCursor()).isNull();
@@ -222,7 +222,7 @@ class PostQueryRepositoryTest {
         Long postId = post.getId();
 
         // when
-        Optional<PostDto> postDto = postQueryRepository.findById(postId);
+        Optional<PostDto> postDto = postQueryRepository.findById(1L, postId);
 
         // then
         assertThat(postDto.isPresent()).isTrue();
@@ -236,10 +236,24 @@ class PostQueryRepositoryTest {
         Long postId = 0L;
 
         // when
-        Optional<PostDto> postDto = postQueryRepository.findById(postId);
+        Optional<PostDto> postDto = postQueryRepository.findById(1L, postId);
 
         // then
         assertThat(postDto.isPresent()).isFalse();
+    }
+
+    @Test
+    @DisplayName("미인증 사용자가 게시글 단건 조회시 작성자와 언팔로우 상태로 조회된다.")
+    void findByIdWithoutAuth() {
+        // given
+        Long postId = 1L;
+
+        // when
+        Optional<PostDto> postDto = postQueryRepository.findById(null, postId);
+
+        // then
+        assertThat(postDto.isPresent()).isTrue();
+        assertThat(postDto.get().getWriter().isFollowed()).isFalse();
     }
 
 

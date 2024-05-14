@@ -34,8 +34,10 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public PostDto getPost(@PathVariable("postId") Long postId) {
-        return postQueryRepository.findById(postId)
+    public PostDto getPost(@AuthenticationPrincipal AccountDto accountDto,
+                           @PathVariable("postId") Long postId) {
+
+        return postQueryRepository.findById(accountDto.getId(), postId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.POST_NOT_FOUND));
     }
 
@@ -59,8 +61,10 @@ public class PostController {
     }
 
     @GetMapping
-    public Scroll<PostScrollDto> scrollPost(@ModelAttribute PostScrollRequest request) {
-        return postQueryRepository.scrollPost(request.cursor(), request.tagName(), request.size());
+    public Scroll<PostScrollDto> scrollPost(@AuthenticationPrincipal AccountDto accountDto,
+                                            @ModelAttribute PostScrollRequest request) {
+
+        return postQueryRepository.scrollPost(accountDto.getId(), request.cursor(), request.tagName(), request.size());
     }
 
     @GetMapping("/{postId}/comment")
@@ -71,9 +75,9 @@ public class PostController {
     @GetMapping("/like")
     @PreAuthorize("isAuthenticated()")
     public Scroll<PostScrollDto> scrollLikePost(@AuthenticationPrincipal AccountDto accountDto,
-                                                    @ModelAttribute LikePostScrollRequest request) {
+                                                @ModelAttribute LikePostScrollRequest request) {
 
-        return postQueryRepository.scrollLikePost(request.cursor(), accountDto.getId(), request.size());
+        return postQueryRepository.scrollLikePost(accountDto.getId(), request.cursor(), accountDto.getId(), request.size());
     }
 
 }

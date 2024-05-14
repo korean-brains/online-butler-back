@@ -44,7 +44,7 @@ class MemberQueryRepositoryTest {
         Long memberId = member.getId();
 
         // when
-        Optional<MemberDto> findById = memberQueryRepository.findById(memberId);
+        Optional<MemberDto> findById = memberQueryRepository.findById(1L, memberId);
 
         // then
         assertThat(findById.isPresent()).isTrue();
@@ -64,10 +64,24 @@ class MemberQueryRepositoryTest {
         Long memberId = 0L;
 
         // when
-        Optional<MemberDto> findById = memberQueryRepository.findById(memberId);
+        Optional<MemberDto> findById = memberQueryRepository.findById(1L, memberId);
 
         // then
         assertThat(findById.isPresent()).isFalse();
+    }
+
+    @Test
+    @DisplayName("미인증 사용자가 조회하면 언팔로우 상태로 조회된다")
+    void findByIdWithoutAuth() {
+        // given
+        Long memberId = member.getId();
+
+        // when
+        Optional<MemberDto> findById = memberQueryRepository.findById(null, memberId);
+
+        // then
+        assertThat(findById.isPresent()).isTrue();
+        assertThat(findById.get().isFollowed()).isFalse();
     }
 
 
