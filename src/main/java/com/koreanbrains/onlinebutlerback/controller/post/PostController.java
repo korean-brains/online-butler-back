@@ -3,6 +3,7 @@ package com.koreanbrains.onlinebutlerback.controller.post;
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
+import com.koreanbrains.onlinebutlerback.common.security.annotation.AuthUser;
 import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.comment.CommentScrollDto;
@@ -11,7 +12,6 @@ import com.koreanbrains.onlinebutlerback.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -27,14 +27,14 @@ public class PostController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("isAuthenticated()")
-    public Long createPost(@AuthenticationPrincipal AccountDto accountDto,
+    public Long createPost(@AuthUser AccountDto accountDto,
                            @ModelAttribute PostCreateRequest request) {
 
         return postService.createPost(request.caption(), request.images(), request.tags(), accountDto.getId());
     }
 
     @GetMapping("/{postId}")
-    public PostDto getPost(@AuthenticationPrincipal AccountDto accountDto,
+    public PostDto getPost(@AuthUser AccountDto accountDto,
                            @PathVariable("postId") Long postId) {
 
         return postQueryRepository.findById(accountDto.getId(), postId)
@@ -44,7 +44,7 @@ public class PostController {
     @PatchMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("isAuthenticated()")
-    public void updatePost(@AuthenticationPrincipal AccountDto accountDto,
+    public void updatePost(@AuthUser AccountDto accountDto,
                            @PathVariable("postId") Long postId,
                            @RequestBody PostUpdateRequest request) {
 
@@ -54,14 +54,14 @@ public class PostController {
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("isAuthenticated()")
-    public void deletePost(@AuthenticationPrincipal AccountDto accountDto,
+    public void deletePost(@AuthUser AccountDto accountDto,
                            @PathVariable("postId") Long postId) {
 
         postService.deletePost(postId, accountDto.getId());
     }
 
     @GetMapping
-    public Scroll<PostScrollDto> scrollPost(@AuthenticationPrincipal AccountDto accountDto,
+    public Scroll<PostScrollDto> scrollPost(@AuthUser AccountDto accountDto,
                                             @ModelAttribute PostScrollRequest request) {
 
         return postQueryRepository.scrollPost(accountDto.getId(), request.cursor(), request.tagName(), request.size());
@@ -74,7 +74,7 @@ public class PostController {
 
     @GetMapping("/like")
     @PreAuthorize("isAuthenticated()")
-    public Scroll<PostScrollDto> scrollLikePost(@AuthenticationPrincipal AccountDto accountDto,
+    public Scroll<PostScrollDto> scrollLikePost(@AuthUser AccountDto accountDto,
                                                 @ModelAttribute LikePostScrollRequest request) {
 
         return postQueryRepository.scrollLikePost(accountDto.getId(), request.cursor(), accountDto.getId(), request.size());
