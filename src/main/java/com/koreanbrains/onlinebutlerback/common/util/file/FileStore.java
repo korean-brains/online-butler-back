@@ -2,6 +2,7 @@ package com.koreanbrains.onlinebutlerback.common.util.file;
 
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.exception.IOException;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -20,6 +21,17 @@ public class FileStore {
     public FileStore(@Value("${file.path}") String filePath, @Value("${file.request-url}") String requestUrl) {
         this.filePath = filePath;
         this.requestUrl = requestUrl;
+    }
+
+    @PostConstruct
+    public void createDirectory() {
+        File directory = new File(filePath);
+        if(!directory.exists()) {
+            boolean isCreated = directory.mkdir();
+            if(!isCreated) {
+                throw new IllegalStateException("Failed to create directory: " + filePath);
+            }
+        }
     }
 
     public UploadFile upload(MultipartFile file, String storeName) {
