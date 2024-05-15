@@ -3,6 +3,7 @@ package com.koreanbrains.onlinebutlerback.controller.members;
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
+import com.koreanbrains.onlinebutlerback.common.security.annotation.AuthUser;
 import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
 import com.koreanbrains.onlinebutlerback.controller.follow.FollowingListScrollRequest;
 import com.koreanbrains.onlinebutlerback.controller.post.PostScrollRequest;
@@ -16,7 +17,6 @@ import com.koreanbrains.onlinebutlerback.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,7 +36,7 @@ public class MemberController {
     }
 
     @GetMapping("/{member-id}")
-    public MemberDto getMember(@AuthenticationPrincipal AccountDto accountDto,
+    public MemberDto getMember(@AuthUser AccountDto accountDto,
                                @PathVariable("member-id") Long memberId) {
 
         return memberQueryRepository.findById(accountDto.getId(), memberId)
@@ -58,13 +58,13 @@ public class MemberController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public MemberDto getMe(@AuthenticationPrincipal AccountDto accountDto) {
+    public MemberDto getMe(@AuthUser AccountDto accountDto) {
         return memberQueryRepository.findById(null, accountDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     @GetMapping("/{memberId}/post")
-    public Scroll<PostScrollDto> scrollWrittenPost(@AuthenticationPrincipal AccountDto accountDto,
+    public Scroll<PostScrollDto> scrollWrittenPost(@AuthUser AccountDto accountDto,
                                                    @PathVariable("memberId") Long memberId,
                                                    @ModelAttribute PostScrollRequest request) {
 

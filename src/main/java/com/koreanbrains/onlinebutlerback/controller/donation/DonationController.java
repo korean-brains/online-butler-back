@@ -1,6 +1,7 @@
 package com.koreanbrains.onlinebutlerback.controller.donation;
 
 import com.koreanbrains.onlinebutlerback.common.page.Page;
+import com.koreanbrains.onlinebutlerback.common.security.annotation.AuthUser;
 import com.koreanbrains.onlinebutlerback.common.security.dto.AccountDto;
 import com.koreanbrains.onlinebutlerback.repository.donation.DonationGiveHistoryDto;
 import com.koreanbrains.onlinebutlerback.repository.donation.DonationQueryRepository;
@@ -9,7 +10,6 @@ import com.koreanbrains.onlinebutlerback.service.donation.DonationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -30,7 +30,7 @@ public class DonationController {
 
     @GetMapping("/give")
     @PreAuthorize("isAuthenticated()")
-    public Page<DonationGiveHistoryDto> getGiveHistory(@AuthenticationPrincipal AccountDto accountDto,
+    public Page<DonationGiveHistoryDto> getGiveHistory(@AuthUser AccountDto accountDto,
                                                        @ModelAttribute DonationGiveHistoryGetRequest request) {
 
         return donationQueryRepository.findGiveHistory(accountDto.getId(), request.getSize(), request.getNumber(), request.getStart(), request.getEnd());
@@ -38,7 +38,7 @@ public class DonationController {
 
     @GetMapping("/receive")
     @PreAuthorize("isAuthenticated()")
-    public Page<DonationReceiveHistoryDto> getReceiveHistory(@AuthenticationPrincipal AccountDto accountDto,
+    public Page<DonationReceiveHistoryDto> getReceiveHistory(@AuthUser AccountDto accountDto,
                                                              @ModelAttribute DonationReceiveHistoryGetRequest request) {
 
         return donationQueryRepository.findReceiveHistory(accountDto.getId(), request.getSize(), request.getNumber(), request.getStart(), request.getEnd());
