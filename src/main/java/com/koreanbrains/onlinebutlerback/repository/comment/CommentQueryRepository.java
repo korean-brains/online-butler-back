@@ -5,7 +5,6 @@ import com.koreanbrains.onlinebutlerback.entity.comment.QComment;
 import com.koreanbrains.onlinebutlerback.entity.member.QMember;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
@@ -24,13 +23,12 @@ public class CommentQueryRepository {
         this.queryFactory = new JPAQueryFactory(entityManager);
     }
 
-    // TODO : select 프로필 이미지 추가
     public Scroll<CommentScrollDto> scrollComment(Long postId, Long cursor, int size) {
         List<CommentScrollDto> comments = queryFactory.select(Projections.constructor(CommentScrollDto.class,
                         comment.id,
                         comment.text,
                         member.name,
-                        Expressions.constant("profile image"),
+                        member.profileImage.url,
                         comment.createdAt
                 ))
                 .from(comment)
@@ -61,9 +59,9 @@ public class CommentQueryRepository {
                         reply.id,
                         reply.text,
                         replyAuthor.name,
-                        Expressions.constant("profile image"),
-                        parent.author.name,
-                        Expressions.constant("profile image"),
+                        replyAuthor.profileImage.url,
+                        parentAuthor.name,
+                        parentAuthor.profileImage.url,
                         reply.createdAt
                 ))
                 .from(reply)
