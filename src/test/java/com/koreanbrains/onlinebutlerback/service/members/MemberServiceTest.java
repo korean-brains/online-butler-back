@@ -1,5 +1,6 @@
 package com.koreanbrains.onlinebutlerback.service.members;
 
+import com.koreanbrains.onlinebutlerback.common.exception.AuthenticationException;
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.fixtures.FileFixture;
 import com.koreanbrains.onlinebutlerback.common.fixtures.MemberFixture;
@@ -47,6 +48,19 @@ public class MemberServiceTest {
 
         // then
         assertThat(memberId).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("이미 사용중인 ID로 회원가입 할수 없다.")
+    void createMemberFailDuplicateEmail() {
+        // given
+        MemberCreateRequest request = new MemberCreateRequest("kim", "kim@gmail.com", "asdfasdf");
+        given(memberRepository.findByEmail(anyString())).willReturn(Optional.of(MemberFixture.member()));
+
+        // when
+        // then
+        assertThatThrownBy(() -> memberService.createMember(request.name(), request.email(), request.password()))
+                .isInstanceOf(AuthenticationException.class);
     }
 
     @Test

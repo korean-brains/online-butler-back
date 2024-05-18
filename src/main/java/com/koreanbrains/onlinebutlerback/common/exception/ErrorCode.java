@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum ErrorCode {
     //401
     UN_AUTHORIZE(401, "AUTH_001", "인증되지 않음"),
+    ALREADY_USED_EMAIL(400, "AUTH_002", "이미 사용중인 email 입니다."),
     NO_AUTHORITIES_KEY(401, "JWT_001", "JWT에 권한 정보가 없습니다."),
     INVALID_SIGNATURE(401, "JWT_002", "잘못된 JWT 서명입니다."),
     EXPIRED_TOKEN(401, "JWT_003", "만료된 JWT 입니다."),
