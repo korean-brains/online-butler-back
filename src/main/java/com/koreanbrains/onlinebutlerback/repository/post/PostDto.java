@@ -18,6 +18,7 @@ public class PostDto {
     private LocalDateTime createdAt;
     private long likeCount;
     private long commentCount;
+    private boolean liked;
     private Writer writer;
 
     private List<String> tags = new ArrayList<>();

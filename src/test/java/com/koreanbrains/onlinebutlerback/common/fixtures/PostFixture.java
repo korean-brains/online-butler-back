@@ -36,6 +36,7 @@ public class PostFixture {
                     LocalDateTime.of(2024, 4, 1, 12, 0, 0),
                     0,
                     0,
+                    false,
                     new PostScrollDto.Writer(1L, "홍길동", "assets/image.jpg", false),
                     List.of("태그1", "태그2"),
                     List.of("assets/image1.jpg", "assets/image2.jpg")
@@ -55,6 +56,7 @@ public class PostFixture {
                 LocalDateTime.of(2024, 4, 1, 12, 0, 0),
                 0,
                 0,
+                false,
                 new PostDto.Writer(1L, "홍길동", "assets/image.jpg", false),
                 List.of("태그1", "태그2"),
                 List.of("assets/image1.jpg", "assets/image2.jpg")

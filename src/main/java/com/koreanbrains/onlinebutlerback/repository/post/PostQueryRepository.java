@@ -61,6 +61,10 @@ public class PostQueryRepository {
                         JPAExpressions.select(comment.count())
                                 .from(comment)
                                 .where(comment.post.eq(post)),
+                        JPAExpressions.selectOne().
+                                from(like)
+                                .where(like.post.eq(post).and(like.member.id.eq(myId)))
+                                .exists(),
                         Projections.constructor(PostScrollDto.Writer.class,
                                 member.id,
                                 member.name,
@@ -139,6 +143,10 @@ public class PostQueryRepository {
                                 Expressions.as(JPAExpressions.select(comment.count())
                                         .from(comment)
                                         .where(comment.post.eq(post)), "commentCount"),
+                                Expressions.as(JPAExpressions.selectOne().
+                                        from(like)
+                                        .where(like.post.eq(post), likeMemberIdEq(myId == null ? 0L : myId))
+                                        .exists(), "liked"),
                                 Expressions.as(Projections.constructor(PostDto.Writer.class,
                                         member.id,
                                         member.name,
@@ -151,7 +159,7 @@ public class PostQueryRepository {
                                 GroupBy.list(tag.name).as("tags")
                         )));
 
-        if(result.isEmpty()) return Optional.empty();
+        if (result.isEmpty()) return Optional.empty();
         PostDto postDto = result.get(postId);
 
         List<String> postImages = queryFactory
@@ -182,7 +190,7 @@ public class PostQueryRepository {
     }
 
     private BooleanExpression isFollow(Long myId, NumberPath<Long> memberId) {
-        if(myId == null) return null;
+        if (myId == null) return null;
         return follow.follower.id.eq(myId).and(follow.following.id.eq(memberId));
     }
 }
