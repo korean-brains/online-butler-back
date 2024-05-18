@@ -62,7 +62,8 @@ public class CommentQueryRepository {
                         replyAuthor.profileImage.url,
                         parentAuthor.name,
                         parentAuthor.profileImage.url,
-                        reply.createdAt
+                        reply.createdAt,
+                        reply.root.id
                 ))
                 .from(reply)
                 .join(reply.author, replyAuthor)
