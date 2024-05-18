@@ -18,17 +18,19 @@ public class PostScrollDto {
     private LocalDateTime createdAt;
     private long likeCount;
     private long commentCount;
+    private boolean liked;
     private Writer writer;
 
     private List<String> tags = new ArrayList<>();
     private List<String> images = new ArrayList<>();
 
-    public PostScrollDto(Long id, String caption, LocalDateTime createdAt, long likeCount, long commentCount, Writer writer) {
+    public PostScrollDto(Long id, String caption, LocalDateTime createdAt, long likeCount, long commentCount, boolean liked, Writer writer) {
         this.id = id;
         this.caption = caption;
         this.createdAt = createdAt;
         this.likeCount = likeCount;
         this.commentCount = commentCount;
+        this.liked = liked;
         this.writer = writer;
     }
 
