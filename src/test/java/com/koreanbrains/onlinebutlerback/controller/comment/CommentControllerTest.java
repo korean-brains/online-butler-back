@@ -85,11 +85,11 @@ class CommentControllerTest extends ControllerTest {
     void scrollReply() throws Exception {
         // given
         List<ReplyScrollDto> content = List.of(
-                new ReplyScrollDto(1L, "답글 내용", "kim", "profile image", "lee", "profile image", LocalDateTime.of(2024, 2, 1, 10, 0)),
-                new ReplyScrollDto(2L, "답글 내용", "kim", "profile image", "lee", "profile image", LocalDateTime.of(2024, 2, 1, 10, 1)),
-                new ReplyScrollDto(3L, "답글 내용", "kim", "profile image", "lee", "profile image", LocalDateTime.of(2024, 2, 1, 10, 2)),
-                new ReplyScrollDto(4L, "답글 내용", "kim", "profile image", "lee", "profile image", LocalDateTime.of(2024, 2, 1, 10, 3)),
-                new ReplyScrollDto(5L, "답글 내용", "kim", "profile image", "lee", "profile image", LocalDateTime.of(2024, 2, 1, 10, 4))
+                new ReplyScrollDto(1L, "답글 내용", "kim", "profile image", "lee", "profile image", LocalDateTime.of(2024, 2, 1, 10, 0), 1L),
+                new ReplyScrollDto(2L, "답글 내용", "kim", "profile image", "lee", "profile image", LocalDateTime.of(2024, 2, 1, 10, 1), 1L),
+                new ReplyScrollDto(3L, "답글 내용", "kim", "profile image", "lee", "profile image", LocalDateTime.of(2024, 2, 1, 10, 2), 1L),
+                new ReplyScrollDto(4L, "답글 내용", "kim", "profile image", "lee", "profile image", LocalDateTime.of(2024, 2, 1, 10, 3), 1L),
+                new ReplyScrollDto(5L, "답글 내용", "kim", "profile image", "lee", "profile image", LocalDateTime.of(2024, 2, 1, 10, 4), 1L)
         );
         given(commentQueryRepository.scrollReply(anyLong(), anyLong(), anyInt()))
                 .willReturn(new Scroll<>(content, 6L, null));
