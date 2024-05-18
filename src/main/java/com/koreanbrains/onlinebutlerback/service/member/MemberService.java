@@ -1,6 +1,7 @@
 package com.koreanbrains.onlinebutlerback.service.member;
 
 import com.koreanbrains.onlinebutlerback.common.entity.UploadedFile;
+import com.koreanbrains.onlinebutlerback.common.exception.AuthenticationException;
 import com.koreanbrains.onlinebutlerback.common.exception.EntityNotFoundException;
 import com.koreanbrains.onlinebutlerback.common.exception.ErrorCode;
 import com.koreanbrains.onlinebutlerback.common.util.file.FileStore;
@@ -23,6 +24,10 @@ public class MemberService {
 
     @Transactional
     public Long createMember(String name, String email, String password) {
+        memberRepository.findByEmail(email).ifPresent((member) -> {
+            throw new AuthenticationException(ErrorCode.ALREADY_USED_EMAIL);
+        });
+
         Member member = Member.builder()
                 .name(name)
                 .email(email)
