@@ -48,7 +48,6 @@ public class CommentQueryRepository {
         return new Scroll<>(comments, nextCursor, null);
     }
 
-    // TODO : select 프로필 이미지 추가
     public Scroll<ReplyScrollDto> scrollReply(Long commentId, Long cursor, int size) {
         QComment reply = new QComment("reply");
         QComment parent = new QComment("parent");
