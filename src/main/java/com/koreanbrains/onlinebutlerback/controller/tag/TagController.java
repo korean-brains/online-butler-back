@@ -1,8 +1,8 @@
 package com.koreanbrains.onlinebutlerback.controller.tag;
 
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
-import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
 import com.koreanbrains.onlinebutlerback.repository.tag.TagQueryRepository;
+import com.koreanbrains.onlinebutlerback.repository.tag.TagScrollDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,8 +17,7 @@ public class TagController {
     private final TagQueryRepository tagQueryRepository;
 
     @GetMapping
-    public Scroll<TagDto> searchTag(@ModelAttribute TagSearchRequest request) {
-        Scroll<Tag> tags = tagQueryRepository.searchTag(request.cursor(), request.tag(), request.size());
-        return tags.map(TagDto::new);
+    public Scroll<TagScrollDto> searchTag(@ModelAttribute TagSearchRequest request) {
+        return tagQueryRepository.searchTag(request.cursor(), request.tag(), request.size());
     }
 }

@@ -53,7 +53,7 @@ class TagQueryRepositoryTest {
         int size = 5;
         
         // when
-        Scroll<Tag> tagScroll = tagQueryRepository.searchTag(cursor, name, size);
+        Scroll<TagScrollDto> tagScroll = tagQueryRepository.searchTag(cursor, name, size);
 
         // then
         assertThat(tagScroll.getContent().size()).isEqualTo(size);
@@ -70,7 +70,7 @@ class TagQueryRepositoryTest {
         int size = 5;
 
         // when
-        Scroll<Tag> tagScroll = tagQueryRepository.searchTag(cursor, name, size);
+        Scroll<TagScrollDto> tagScroll = tagQueryRepository.searchTag(cursor, name, size);
 
         // then
         assertThat(tagScroll.getContent().size()).isEqualTo(size);
