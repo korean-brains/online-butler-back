@@ -1,5 +1,6 @@
 package com.koreanbrains.onlinebutlerback.repository.member;
 
+import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.NumberPath;
@@ -8,6 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.koreanbrains.onlinebutlerback.entity.follow.QFollow.follow;
@@ -48,6 +50,31 @@ public class MemberQueryRepository {
                 .fetchOne();
 
         return memberDto == null ? Optional.empty() : Optional.of(memberDto);
+    }
+
+    public Scroll<MemberScrollDto> scrollSearchMember(Long cursor, int size, String name) {
+        List<MemberScrollDto> members = queryFactory.select(Projections.constructor(MemberScrollDto.class,
+                        member.id,
+                        member.profileImage.url,
+                        member.name,
+                        member.introduction
+                ))
+                .from(member)
+                .where(member.name.contains(name), memberIdGoe(cursor))
+                .limit(size + 1)
+                .fetch();
+
+        Long nextCursor = null;
+        if (members.size() > size) {
+            nextCursor = members.get(members.size() - 1).id();
+            members.remove(members.size() - 1);
+        }
+
+        return new Scroll<>(members, nextCursor, null);
+    }
+
+    private BooleanExpression memberIdGoe(Long id) {
+        return id == null ? null : member.id.goe(id);
     }
 
     private BooleanExpression isFollow(Long myId, NumberPath<Long> memberId) {

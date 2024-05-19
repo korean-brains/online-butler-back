@@ -1,6 +1,8 @@
 package com.koreanbrains.onlinebutlerback.repository.member;
 
 import com.koreanbrains.onlinebutlerback.common.entity.UploadedFile;
+import com.koreanbrains.onlinebutlerback.common.fixtures.MemberFixture;
+import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -82,6 +85,57 @@ class MemberQueryRepositoryTest {
         // then
         assertThat(findById.isPresent()).isTrue();
         assertThat(findById.get().isFollowed()).isFalse();
+    }
+
+    @Test
+    @DisplayName("사용자를 무한 스크롤로 검색한다")
+    void searchMember() {
+        // given
+        List<Member> members = memberRepository.saveAll(List.of(MemberFixture.member(null, "member 1"),
+                MemberFixture.member(null, "member 2"),
+                MemberFixture.member(null, "member 3"),
+                MemberFixture.member(null, "member 4"),
+                MemberFixture.member(null, "member 5")));
+
+        Long cursor = null;
+        int size = 3;
+        String name = "member";
+
+        // when
+        Scroll<MemberScrollDto> findMembers = memberQueryRepository.scrollSearchMember(cursor, size, name);
+
+        // then
+        assertThat(findMembers.getNextCursor()).isEqualTo(members.get(3).getId());
+        assertThat(findMembers.getNextSubCursor()).isNull();
+        assertThat(findMembers.getContent().size()).isEqualTo(3);
+        assertThat(findMembers.getContent().get(0).name()).isEqualTo(members.get(0).getName());
+        assertThat(findMembers.getContent().get(1).name()).isEqualTo(members.get(1).getName());
+        assertThat(findMembers.getContent().get(2).name()).isEqualTo(members.get(2).getName());
+    }
+
+    @Test
+    @DisplayName("사용자 검색 결과 무한스크롤의 마지막 페이지를 조회한다")
+    void searchMemberLastPage() {
+        // given
+        List<Member> members = memberRepository.saveAll(List.of(MemberFixture.member(null, "member 1"),
+                MemberFixture.member(null, "member 2"),
+                MemberFixture.member(null, "member 3"),
+                MemberFixture.member(null, "member 4"),
+                MemberFixture.member(null, "member 5")));
+
+        Long cursor = members.get(3).getId();
+        int size = 3;
+        String name = "member";
+
+        // when
+        Scroll<MemberScrollDto> findMembers = memberQueryRepository.scrollSearchMember(cursor, size, name);
+
+        // then
+        assertThat(findMembers.getNextCursor()).isNull();
+        assertThat(findMembers.getNextSubCursor()).isNull();
+        assertThat(findMembers.getContent().size()).isEqualTo(2);
+        assertThat(findMembers.getContent().get(0).name()).isEqualTo(members.get(3).getName());
+        assertThat(findMembers.getContent().get(1).name()).isEqualTo(members.get(4).getName());
     }
 
 
