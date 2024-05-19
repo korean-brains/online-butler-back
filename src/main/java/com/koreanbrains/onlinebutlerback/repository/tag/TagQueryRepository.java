@@ -1,15 +1,18 @@
 package com.koreanbrains.onlinebutlerback.repository.tag;
 
 import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
-import com.koreanbrains.onlinebutlerback.entity.tag.Tag;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.koreanbrains.onlinebutlerback.entity.post.QPost.post;
 import static com.koreanbrains.onlinebutlerback.entity.tag.QTag.*;
+import static com.koreanbrains.onlinebutlerback.entity.tag.QTagMapping.tagMapping;
 
 @Repository
 public class TagQueryRepository {
@@ -20,8 +23,15 @@ public class TagQueryRepository {
         this.queryFactory = new JPAQueryFactory(em);
     }
 
-    public Scroll<Tag> searchTag(Long cursor, String name, int size) {
-        List<Tag> tags = queryFactory.select(tag)
+    public Scroll<TagScrollDto> searchTag(Long cursor, String name, int size) {
+        List<TagScrollDto> tags = queryFactory.select(Projections.constructor(TagScrollDto.class,
+                        tag.id,
+                        tag.name,
+                        JPAExpressions.select(post.count())
+                                .from(post)
+                                .join(tagMapping).on(tagMapping.post.eq(post))
+                                .where(tagMapping.tag.eq(tag))
+                ))
                 .from(tag)
                 .where(tag.name.contains(name),
                         idGoe(cursor))
@@ -29,8 +39,8 @@ public class TagQueryRepository {
                 .fetch();
 
         Long nextCursor = null;
-        if(tags.size() > size) {
-            nextCursor = tags.get(tags.size() - 1).getId();
+        if (tags.size() > size) {
+            nextCursor = tags.get(tags.size() - 1).id();
             tags.remove(tags.size() - 1);
         }
 
