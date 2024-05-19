@@ -11,6 +11,7 @@ import com.koreanbrains.onlinebutlerback.repository.follow.FollowDto;
 import com.koreanbrains.onlinebutlerback.repository.follow.FollowQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberDto;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberQueryRepository;
+import com.koreanbrains.onlinebutlerback.repository.member.MemberScrollDto;
 import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostScrollDto;
 import com.koreanbrains.onlinebutlerback.service.member.MemberService;
@@ -83,6 +84,11 @@ public class MemberController {
                                                 @ModelAttribute FollowingListScrollRequest request) {
 
         return followQueryRepository.findFollowerList(memberId, request.getCursor(), request.getSize());
+    }
+
+    @GetMapping("/search")
+    public Scroll<MemberScrollDto> scrollSearchMember(@ModelAttribute MemberSearchRequest request) {
+        return memberQueryRepository.scrollSearchMember(request.getCursor(), request.getSize(), request.getName());
     }
 
 }

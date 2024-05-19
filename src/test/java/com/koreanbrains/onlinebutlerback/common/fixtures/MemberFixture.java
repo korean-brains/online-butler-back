@@ -1,8 +1,13 @@
 package com.koreanbrains.onlinebutlerback.common.fixtures;
 
 import com.koreanbrains.onlinebutlerback.common.entity.UploadedFile;
+import com.koreanbrains.onlinebutlerback.common.scroll.Scroll;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberDto;
+import com.koreanbrains.onlinebutlerback.repository.member.MemberScrollDto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MemberFixture {
     public static Member member() {
@@ -44,4 +49,14 @@ public class MemberFixture {
     public static MemberDto memberDto() {
         return new MemberDto(1L, "kim", "kim@gmail.com", "assets/image.jpg", "hello", 10, 10, 10, false);
     }
+
+    public static Scroll<MemberScrollDto> memberScroll(int size, Long nextCursor, Long nextSubCursor) {
+        List<MemberScrollDto> members = new ArrayList<>();
+        for (long i = 1; i <= size; i++) {
+            members.add(new MemberScrollDto(i, "/assets/profile.jpg", "member " + i, "hello"));
+        }
+
+        return new Scroll<>(members, nextCursor, nextSubCursor);
+    }
+
 }

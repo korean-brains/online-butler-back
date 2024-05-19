@@ -14,6 +14,7 @@ import com.koreanbrains.onlinebutlerback.repository.follow.FollowQueryRepository
 import com.koreanbrains.onlinebutlerback.repository.member.MemberDto;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
+import com.koreanbrains.onlinebutlerback.repository.member.MemberScrollDto;
 import com.koreanbrains.onlinebutlerback.repository.post.PostQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostScrollDto;
 import com.koreanbrains.onlinebutlerback.service.member.MemberService;
@@ -233,6 +234,31 @@ class MemberControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.content[0].memberId").exists())
                 .andExpect(jsonPath("$.content[0].name").exists())
                 .andExpect(jsonPath("$.content[0].profileImage").exists());
+    }
+
+    @Test
+    @DisplayName("회원을 검색한다")
+    void searchMember() throws Exception {
+        // given
+        Scroll<MemberScrollDto> members = MemberFixture.memberScroll(5, 6L, null);
+        given(memberQueryRepository.scrollSearchMember(anyLong(), anyInt(), anyString()))
+                .willReturn(members);
+
+        // when
+        ResultActions result = mockMvc.perform(get("/api/member/search")
+                .param("cursor", "1")
+                .param("size", "5")
+                .param("name", "member"));
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.nextCursor").value(6))
+                .andExpect(jsonPath("$.nextSubCursor").isEmpty())
+                .andExpect(jsonPath("$.content.length()").value(5))
+                .andExpect(jsonPath("$.content[0].id").exists())
+                .andExpect(jsonPath("$.content[0].profileImage").exists())
+                .andExpect(jsonPath("$.content[0].name").exists())
+                .andExpect(jsonPath("$.content[0].introduction").exists());
     }
 
 }
