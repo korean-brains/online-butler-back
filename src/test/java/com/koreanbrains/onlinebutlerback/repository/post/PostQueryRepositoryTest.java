@@ -127,6 +127,24 @@ class PostQueryRepositoryTest {
     }
 
     @Test
+    @DisplayName("미인증 사용자가 포스트 목록을 조회하면 작성자와 언팔로우 상태로 조회한다")
+    void scrollPostWithoutAuth() {
+        // given
+        Long cursor = null;
+        String tagName = null;
+        int size = 5;
+
+        // when
+        Scroll<PostScrollDto> result = postQueryRepository.scrollPost(null, cursor, tagName, size);
+
+        // then
+        assertThat(result.getNextCursor()).isEqualTo(5L);
+        assertThat(result.getNextSubCursor()).isNull();
+        assertThat(result.getContent().size()).isEqualTo(size);
+        assertThat(result.getContent().get(0).getWriter().isFollowed()).isFalse();
+    }
+
+    @Test
     @DisplayName("특정 해시태그가 있는 포스트 목록을 무한스크롤로 조회한다")
     void scrollPostTag() {
         // given
