@@ -63,7 +63,7 @@ public class PostQueryRepository {
                                 .where(comment.post.eq(post)),
                         JPAExpressions.selectOne().
                                 from(like)
-                                .where(like.post.eq(post).and(like.member.id.eq(myId)))
+                                .where(like.post.eq(post).and(like.member.id.eq(myId == null ? 0L : myId)))
                                 .exists(),
                         Projections.constructor(PostScrollDto.Writer.class,
                                 member.id,
