@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -392,13 +393,34 @@ class DonationQueryRepositoryTest {
             assertThatThrownBy(() -> donationQueryRepository.findReceiveHistory(receiverId, size, number, start, end))
                     .isInstanceOf(IllegalArgumentException.class);
         }
+
+        @Test
+        @DisplayName("후원 랭킹 목록을 조회한다")
+        void findReceiveRanking() {
+            // given
+            Long receiverId = receiver.getId();
+            int size = 5;
+            int number = 1;
+
+            // when
+            Page<DonationReceiveRankingDto> result = donationQueryRepository.findReceiveRanking(receiverId, size, number);
+
+            // then
+            assertThat(result.getContent().size()).isEqualTo(5);
+            assertThat(result.getSize()).isEqualTo(5);
+            assertThat(result.getNumber()).isEqualTo(1);
+            assertThat(result.isFirst()).isTrue();
+            assertThat(result.isHasNext()).isTrue();
+            assertThat(result.getTotalElements()).isEqualTo(10);
+            assertThat(result.getTotalPages()).isEqualTo(2);
+        }
     }
 
     @TestConfiguration
     static class Config {
         @Bean
-        public DonationQueryRepository donationQueryRepository(EntityManager em) {
-            return new DonationQueryRepository(em);
+        public DonationQueryRepository donationQueryRepository(EntityManager em, JdbcTemplate jdbcTemplate) {
+            return new DonationQueryRepository(em, jdbcTemplate);
         }
     }
 }

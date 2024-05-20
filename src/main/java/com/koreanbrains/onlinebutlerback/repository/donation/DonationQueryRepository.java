@@ -5,8 +5,10 @@ import com.koreanbrains.onlinebutlerback.common.exception.IllegalArgumentExcepti
 import com.koreanbrains.onlinebutlerback.common.page.Page;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -19,9 +21,11 @@ import static com.koreanbrains.onlinebutlerback.entity.member.QMember.member;
 public class DonationQueryRepository {
 
     private final JPAQueryFactory queryFactory;
+    private final JdbcTemplate jdbcTemplate;
 
-    public DonationQueryRepository(EntityManager entityManager) {
+    public DonationQueryRepository(EntityManager entityManager, JdbcTemplate jdbcTemplate) {
         this.queryFactory = new JPAQueryFactory(entityManager);
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public Page<DonationGiveHistoryDto> findGiveHistory(Long giverId, int size, int number, LocalDateTime start, LocalDateTime end) {
@@ -70,6 +74,28 @@ public class DonationQueryRepository {
                 .where(receiverId(receiverId), betweenDate(start, end))
                 .fetchOne()
                 .longValue();
+
+        return new Page<>(result, number, size, totalCount);
+    }
+
+    public Page<DonationReceiveRankingDto> findReceiveRanking(long receiverId, int size, int number) {
+        List<DonationReceiveRankingDto> result = queryFactory.select(Projections.constructor(DonationReceiveRankingDto.class,
+                        donation.id,
+                        donation.giver.name,
+                        donation.amount.sum().as("totalAmount")
+                ))
+                .from(donation)
+                .where(receiverId(receiverId))
+                .groupBy(donation.giver)
+                .orderBy(Expressions.stringPath("totalAmount").desc())
+                .offset((long) size * (number - 1)) // 페이지 번호 1부터 시작
+                .limit(size)
+                .fetch();
+
+        Long totalCount = jdbcTemplate.queryForObject("select count(d.giver_id) from (select d.giver_id from donation d where d.receiver_id = ? group by d.giver_id) as d",
+                Long.class,
+                receiverId
+        );
 
         return new Page<>(result, number, size, totalCount);
     }

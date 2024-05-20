@@ -3,9 +3,11 @@ package com.koreanbrains.onlinebutlerback.controller.donation;
 import com.koreanbrains.onlinebutlerback.common.ControllerTest;
 import com.koreanbrains.onlinebutlerback.common.context.WithRestMockUser;
 import com.koreanbrains.onlinebutlerback.common.page.Page;
+import com.koreanbrains.onlinebutlerback.common.page.PageRequest;
 import com.koreanbrains.onlinebutlerback.repository.donation.DonationGiveHistoryDto;
 import com.koreanbrains.onlinebutlerback.repository.donation.DonationQueryRepository;
 import com.koreanbrains.onlinebutlerback.repository.donation.DonationReceiveHistoryDto;
+import com.koreanbrains.onlinebutlerback.repository.donation.DonationReceiveRankingDto;
 import com.koreanbrains.onlinebutlerback.service.donation.DonationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -129,6 +131,45 @@ class DonationControllerTest extends ControllerTest {
                 .andExpect(jsonPath("$.totalElements").value(10))
                 .andExpect(jsonPath("$.hasNext").value(true))
                 .andExpect(jsonPath("$.first").value(true));
+    }
+
+    @Test
+    @DisplayName("후원 랭킹 목록을 페이지네이션으로 조회한다")
+    @WithRestMockUser
+    void getDonationRanking() throws Exception {
+        // given
+        List<DonationReceiveRankingDto> content = List.of(
+                new DonationReceiveRankingDto(1L, "kim", 5000),
+                new DonationReceiveRankingDto(2L, "kim", 4000),
+                new DonationReceiveRankingDto(3L, "kim", 3000),
+                new DonationReceiveRankingDto(4L, "kim", 2000),
+                new DonationReceiveRankingDto(5L, "kim", 1000)
+        );
+        given(donationQueryRepository.findReceiveRanking(anyLong(), anyInt(), anyInt()))
+                .willReturn(new Page<>(content, 1, 5, 10));
+
+        PageRequest request = PageRequest.builder()
+                .size(5)
+                .number(1)
+                .build();
+
+        // when
+        ResultActions result = mockMvc.perform(get("/api/donation/ranking")
+                .param("size", String.valueOf(request.getSize()))
+                .param("number", String.valueOf(request.getNumber())));
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(5))
+                .andExpect(jsonPath("$.number").value(1))
+                .andExpect(jsonPath("$.size").value(5))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.totalElements").value(10))
+                .andExpect(jsonPath("$.hasNext").value(true))
+                .andExpect(jsonPath("$.first").value(true))
+                .andExpect(jsonPath("$.content[0].id").exists())
+                .andExpect(jsonPath("$.content[0].name").exists())
+                .andExpect(jsonPath("$.content[0].amount").exists());
     }
 
 }
