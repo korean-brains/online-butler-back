@@ -46,8 +46,6 @@ class PostServiceTest {
     @Mock
     TagService tagService;
     @Mock
-    CommentRepository commentRepository;
-    @Mock
     MemberRepository memberRepository;
 
 
@@ -172,17 +170,14 @@ class PostServiceTest {
                 );
         given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
         given(postImageRepository.findByPostId(anyLong())).willReturn(postImages);
-        doNothing().when(fileStore).delete(anyString());
+        given(fileStore.delete(anyString())).willReturn(true);
         doNothing().when(postRepository).delete(any());
-        doNothing().when(postImageRepository).deleteAll(anyList());
-        doNothing().when(commentRepository).deleteByPost(any());
 
         // when
         postService.deletePost(1L, 1L);
 
         // then
         then(postRepository).should().delete(post);
-        then(postImageRepository).should().deleteAll(postImages);
         then(fileStore).should(times(3)).delete(anyString());
     }
 

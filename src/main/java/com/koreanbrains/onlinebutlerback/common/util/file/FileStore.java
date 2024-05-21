@@ -57,11 +57,8 @@ public class FileStore {
         }
     }
 
-    public void delete(String filename) {
-        boolean result = new File(getFullPath(filename)).delete();
-        if(!result) {
-            throw new IOException(ErrorCode.FILE_NOT_DELETED);
-        }
+    public boolean delete(String filename) {
+        return new File(getFullPath(filename)).delete();
     }
 
     public boolean hasFile(MultipartFile file) {
