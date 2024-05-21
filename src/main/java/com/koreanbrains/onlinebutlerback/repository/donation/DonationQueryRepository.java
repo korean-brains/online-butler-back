@@ -40,6 +40,7 @@ public class DonationQueryRepository {
                 .from(donation)
                 .join(donation.receiver, member)
                 .where(giverIdEq(giverId), betweenDate(start, end))
+                .orderBy(donation.createdAt.desc())
                 .offset((long) size * (number - 1)) // 페이지 번호 1부터 시작
                 .limit(size)
                 .fetch();
@@ -65,6 +66,7 @@ public class DonationQueryRepository {
                 .from(donation)
                 .join(donation.giver, member)
                 .where(receiverId(receiverId), betweenDate(start, end))
+                .orderBy(donation.createdAt.desc())
                 .offset((long) size * (number - 1)) // 페이지 번호 1부터 시작
                 .limit(size)
                 .fetch();
