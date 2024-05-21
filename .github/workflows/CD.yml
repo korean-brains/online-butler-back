@@ -57,5 +57,5 @@ jobs:
           script: |
             docker rm -f ${{ secrets.PROJECT_NAME }}
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
-            docker run --name ${{ secrets.PROJECT_NAME }} --network online-butler-net -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
+            docker run -v /home/korean-brains/online-butler/assets:/assets --name ${{ secrets.PROJECT_NAME }} --network online-butler-net -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             docker image prune -a -f
