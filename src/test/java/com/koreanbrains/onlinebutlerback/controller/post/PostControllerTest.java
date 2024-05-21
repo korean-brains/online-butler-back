@@ -65,6 +65,26 @@ class PostControllerTest extends ControllerTest {
     }
 
     @Test
+    @DisplayName("포스트 생성시 tag가 설정되지 않아도 정상적으로 생성된다")
+    @WithRestMockUser
+    void createPostWithoutTag() throws Exception {
+        given(postService.createPost(any(), any(), any(), any())).willReturn(1L);
+        MockMultipartFile images = new MockMultipartFile("images",
+                "cat.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "<<image>>".getBytes());
+
+        // when
+        ResultActions result = mockMvc.perform(multipart("/api/post")
+                .file(images)
+                .param("caption", "포스트 내용"));
+
+        // then
+        result.andExpect(status().isCreated())
+                .andExpect(content().string("1"));
+    }
+
+    @Test
     @DisplayName("포스트를 조회한다")
     @WithRestMockUser
     void getPost() throws Exception {
