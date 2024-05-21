@@ -30,7 +30,7 @@ public class PostController {
     public Long createPost(@AuthUser AccountDto accountDto,
                            @ModelAttribute PostCreateRequest request) {
 
-        return postService.createPost(request.caption(), request.images(), request.tags(), accountDto.getId());
+        return postService.createPost(request.caption(), request.images(), request.tags() == null ? new String[0] : request.tags(), accountDto.getId());
     }
 
     @GetMapping("/{postId}")
