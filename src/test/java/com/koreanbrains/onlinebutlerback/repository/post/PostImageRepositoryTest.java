@@ -16,12 +16,15 @@ class PostImageRepositoryTest {
 
     @Autowired
     PostImageRepository postImageRepository;
+    @Autowired
+    PostRepository postRepository;
 
     @Test
     @DisplayName("포스트에 등록된 이미지를 조회한다")
     void findByPostId() {
         // given
         Post post = Post.builder().id(1L).build();
+        postRepository.save(post);
         postImageRepository.save(PostImage.builder().post(post).build());
         postImageRepository.save(PostImage.builder().post(post).build());
         postImageRepository.save(PostImage.builder().post(post).build());

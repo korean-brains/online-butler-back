@@ -8,7 +8,6 @@ import com.koreanbrains.onlinebutlerback.common.util.file.UploadFile;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.entity.post.Post;
 import com.koreanbrains.onlinebutlerback.entity.post.PostImage;
-import com.koreanbrains.onlinebutlerback.repository.comment.CommentRepository;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostImageRepository;
 import com.koreanbrains.onlinebutlerback.repository.post.PostRepository;
@@ -31,7 +30,6 @@ public class PostService {
     private final PostImageRepository postImageRepository;
     private final TagService tagService;
     private final FileStore fileStore;
-    private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -85,11 +83,9 @@ public class PostService {
 
             List<PostImage> postImages = postImageRepository.findByPostId(postId);
             for (PostImage postImage : postImages) {
-                fileStore.delete(postImage.getStoredName());
+                    fileStore.delete(postImage.getStoredName());
             }
-            postImageRepository.deleteAll(postImages);
-            tagService.resetTags(post.getId());
-            commentRepository.deleteByPost(post);
+
             postRepository.delete(post);
         });
     }

@@ -25,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.doNothing;
 
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
@@ -129,7 +128,7 @@ public class MemberServiceTest {
         given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
         given(fileStore.upload(any(), anyString())).willReturn(uploadFile);
         given(fileStore.hasFile(any())).willReturn(true);
-        doNothing().when(fileStore).delete(anyString());
+        given(fileStore.delete(anyString())).willReturn(true);
 
         // when
         memberService.updateMember(1L, name, introduction, profileImage);
