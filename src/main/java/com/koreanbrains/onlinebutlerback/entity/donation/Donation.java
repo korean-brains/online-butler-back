@@ -25,7 +25,7 @@ public class Donation {
     private Member receiver;
 
     @Column(nullable = false)
-    private String receiptId;
+    private String paymentId;
 
     private int amount;
     private String message;
