@@ -37,8 +37,8 @@ class DonationControllerTest extends ControllerTest {
     @WithRestMockUser
     void verify() throws Exception {
         // given
-        doNothing().when(donationService).save(anyString(), anyLong(), anyLong(), anyString());
-        DonationRequest donationRequest = new DonationRequest("66094df500be0400302256f1", 1L, 2L, "message");
+        doNothing().when(donationService).save(anyString(), anyInt(), anyLong(), anyLong(), anyString());
+        DonationRequest donationRequest = new DonationRequest("payment-febc83d3-9229-4fcd-b8be-50c575b5fafa", 1000, 1L, 2L, "message");
 
         // when
         ResultActions result = mockMvc.perform(post("/api/donation/verify")

@@ -58,7 +58,7 @@ class DonationQueryRepositoryTest {
                             .receiver(r)
                             .giver(giver)
                             .amount(1000)
-                            .receiptId("66094df500be0400302256f1")
+                            .paymentId("payment-febc83d3-9229-4fcd-b8be-50c575b5fafa")
                             .createdAt(LocalDateTime.of(2024, 4, 1, 12, 0))
                             .build())
                     .toList();
@@ -239,7 +239,7 @@ class DonationQueryRepositoryTest {
                             .giver(r)
                             .receiver(receiver)
                             .amount(1000)
-                            .receiptId("66094df500be0400302256f1")
+                            .paymentId("payment-febc83d3-9229-4fcd-b8be-50c575b5fafa")
                             .createdAt(LocalDateTime.of(2024, 4, 1, 12, 0))
                             .build())
                     .toList();
