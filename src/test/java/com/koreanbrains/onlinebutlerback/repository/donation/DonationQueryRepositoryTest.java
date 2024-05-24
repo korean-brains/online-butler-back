@@ -7,21 +7,20 @@ import com.koreanbrains.onlinebutlerback.entity.donation.Donation;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import com.koreanbrains.onlinebutlerback.repository.member.MemberRepository;
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
+@SpringJUnitConfig
 @DataJpaTest
 class DonationQueryRepositoryTest {
 
@@ -413,6 +412,22 @@ class DonationQueryRepositoryTest {
             assertThat(result.isHasNext()).isTrue();
             assertThat(result.getTotalElements()).isEqualTo(10);
             assertThat(result.getTotalPages()).isEqualTo(2);
+        }
+
+        @Test
+        @DisplayName("사용자별 후원 금액 집계")
+        void findAggregationTotalAmountByPeriod() {
+            // given
+            LocalDateTime start = LocalDateTime.of(2024, 4, 1, 0, 0);
+            LocalDateTime end = start.plusMonths(1);
+
+            // when
+            List<DonationAmountByPeriodDto> result = donationRepository.findAggregationTotalAmountByPeriod(start, end);
+
+            // then
+            assertThat(result.size()).isEqualTo(1);
+            assertThat(result.get(0).member().getId()).isEqualTo(receiver.getId());
+            assertThat(result.get(0).totalAmount()).isEqualTo(10000);
         }
     }
 
