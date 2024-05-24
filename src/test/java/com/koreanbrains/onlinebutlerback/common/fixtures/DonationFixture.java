@@ -1,20 +1,20 @@
 package com.koreanbrains.onlinebutlerback.common.fixtures;
 
-import java.util.HashMap;
+import com.koreanbrains.onlinebutlerback.entity.donation.Donation;
+import com.koreanbrains.onlinebutlerback.entity.member.Member;
+
+import java.time.LocalDateTime;
 
 public class DonationFixture {
 
-    public static HashMap<String, Object> receipt() {
-        return new HashMap<>(){{
-           put("error_code", null);
-           put("price", 1000);
-           put("purchased_at", "2024-04-01T12:00:00+09:00");
-        }};
-    }
-
-    public static HashMap<String, Object> receiptWithErrorCode() {
-        return new HashMap<>(){{
-           put("error_code", "APP_KEY_NOT_FOUND");
-        }};
+    public static Donation donation(Member giver, Member receiver, int amount, LocalDateTime createdAt) {
+        return Donation.builder()
+                .paymentId("payment-febc83d3-9229-4fcd-b8be-50c575b5fafa")
+                .message("text")
+                .receiver(receiver)
+                .giver(giver)
+                .amount(amount)
+                .createdAt(createdAt)
+                .build();
     }
 }

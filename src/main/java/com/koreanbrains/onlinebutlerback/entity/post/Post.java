@@ -4,10 +4,11 @@ import com.koreanbrains.onlinebutlerback.common.entity.BaseTimeEntity;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
-@Builder
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Post extends BaseTimeEntity {

@@ -4,8 +4,9 @@ import com.koreanbrains.onlinebutlerback.common.entity.BaseTimeEntity;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@SuperBuilder
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
