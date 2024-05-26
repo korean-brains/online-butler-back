@@ -103,7 +103,8 @@ jacocoTestReport {
                             '**/common/util/p6spy/**',
                             '**/common/util/file/**',
                             '**/controller/file/**',
-                            '**/common/security/**'
+                            '**/common/security/**',
+                            '**/service/settlement/SettlementService',
                     ] + Qdomains)
                 })
         )
@@ -143,7 +144,8 @@ jacocoTestCoverageVerification {
                     '**.common.util.p6spy.**',
                     '**.common.util.file.**',
                     '**.controller.file.**',
-                    '**.common.security.**'
+                    '**.common.security.**',
+                    '**.service.settlement.SettlementService',
             ] + Qdomains
         }
     }

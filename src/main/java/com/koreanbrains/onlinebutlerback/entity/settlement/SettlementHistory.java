@@ -1,4 +1,4 @@
-package com.koreanbrains.onlinebutlerback.entity.post;
+package com.koreanbrains.onlinebutlerback.entity.settlement;
 
 import com.koreanbrains.onlinebutlerback.common.entity.BaseTimeEntity;
 import com.koreanbrains.onlinebutlerback.entity.member.Member;
@@ -6,21 +6,20 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+@SuperBuilder
 @Entity
 @Getter
-@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Post extends BaseTimeEntity {
+public class SettlementHistory extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String caption;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member writer;
+    private long amount;
+    @Enumerated(EnumType.STRING)
+    private SettlementStatus status;
 
-    public void changeCaption(String caption) {
-        this.caption = caption;
-    }
+    @ManyToOne
+    private Member member;
 }
